@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skins Case Opener - Neon Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { background-image: url('Tło.png'); background-color: #0a0a10; background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; color: #ffffff; font-family: 'Montserrat', sans-serif; margin: 0; padding-top: 80px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 75px; background: rgba(10, 10, 16, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 0, 200, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; z-index: 1000; box-shadow: 0 4px 30px rgba(0,0,0,0.6); }
+        .logo { font-size: 26px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; display: flex; align-items: center; }
+        .logo span { background: linear-gradient(90deg, #ff007a, #9d00ff); -webkit-background-clip: text; color: transparent; margin-left: 6px; }
+        .nav-links { display: flex; list-style: none; gap: 15px; margin: 0; padding: 0; }
+        .nav-links a { color: #8b8b9e; text-decoration: none; font-size: 13px; font-weight: 800; text-transform: uppercase; transition: all 0.3s ease; cursor: pointer; letter-spacing: 1px; padding: 5px; }
+        .nav-links a:hover, .nav-links a.active { color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.6); }
+        .user-panel { display: flex; align-items: center; gap: 10px; }
+        .level-container { display: flex; flex-direction: column; align-items: center; margin-right: 5px; }
+        .level-badge { background: linear-gradient(45deg, #9d00ff, #00e5ff); padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .xp-bar { width: 80px; height: 6px; background: #2d2642; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .xp-fill { height: 100%; background: #00e5ff; width: 0%; transition: width 0.5s; box-shadow: 0 0 10px #00e5ff; }
+        .btn-daily { background: #ffea00; color: #000; font-size: 18px; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-daily.disabled { background: #2d2642; color: #8b8b9e; cursor: not-allowed; }
+        .balance, .balance-points { background: rgba(255, 255, 255, 0.05); padding: 10px 15px; border-radius: 8px; font-size: 15px; font-weight: 800; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 15px rgba(0, 229, 255, 0.1); }
+        .balance { color: #00e5ff; } .balance-points { color: #ffea00; border-color: rgba(255, 234, 0, 0.3); box-shadow: 0 0 15px rgba(255, 234, 0, 0.1); }
+        .deposit-btn { background: linear-gradient(45deg, #00e5ff, #0077ff); color: white; border: none; padding: 10px 20px; font-size: 13px; font-weight: 900; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .deposit-btn:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 25px rgba(0, 229, 255, 0.6); }
+        .avatar { width: 45px; height: 45px; background: linear-gradient(45deg, #ff007a, #9d00ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.3s; }
+        .avatar:hover { transform: rotate(5deg) scale(1.1); box-shadow: 0 0 15px rgba(255, 0, 122, 0.5); }
+        
+        .game-area { display: none; flex-direction: column; align-items: center; flex-grow: 1; width: 90%; max-width: 1300px; margin: 50px 0; animation: fadeIn 0.3s ease; }
+        .game-area.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h1 { color: #fff; margin-bottom: 40px; font-size: 36px; text-transform: uppercase; letter-spacing: 3px; text-align: center; text-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .btn-open { margin-top: 20px; padding: 15px 40px; font-size: 18px; font-weight: 900; background: linear-gradient(45deg, #ff007a, #9d00ff); color: white; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; box-shadow: 0 10px 30px rgba(157, 0, 255, 0.4); }
+        .btn-open:hover { transform: scale(1.05); box-shadow: 0 15px 40px rgba(255, 0, 122, 0.6); }
+        .btn-open:disabled { background: #332d4a; color: #555; cursor: not-allowed; box-shadow: none; transform: scale(1); }
+        .mult-btn { background: #1c182b; border: 1px solid #2d2642; color: #8b8b9e; padding: 10px 15px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .mult-btn:hover, .mult-btn.active { background: #00e5ff; color: #000; border-color: #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+
+        .cases-grid { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+        .case-card { background: linear-gradient(180deg, #1c182b 0%, #110e1a 100%); border: 1px solid #2d2642; border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .case-card:hover { border-color: #ff00e5; transform: translateY(-10px); }
+        .case-image-wrapper img { max-width: 160px; filter: drop-shadow(0 15px 20px rgba(0,0,0,0.8)); }
+        .case-name { font-weight: 900; font-size: 20px; margin: 15px 0; text-transform: uppercase; }
+        .case-price { background: linear-gradient(90deg, #ff007a, #9d00ff); padding: 8px 18px; border-radius: 8px; font-weight: 800; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 4, 10, 0.95); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: linear-gradient(180deg, #1c182b 0%, #110e1a 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 40px; width: 90%; max-width: 950px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 28px; color: #8b8b9e; cursor: pointer; transition: color 0.2s; z-index: 10; }
+        .close-modal:hover { color: #ff007a; }
+        .roulette-wrapper { position: relative; width: 100%; height: 190px; background: #0d0b14; border-radius: 12px; margin: 20px 0; overflow: hidden; border: 1px solid #2d2642; }
+        .selector { position: absolute; left: 50%; top: 0; width: 4px; height: 100%; background: #00e5ff; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px #00e5ff; }
+        .case-roll { display: flex; position: absolute; left: 0; top: 0; height: 100%; transition: transform 6s cubic-bezier(0.1, 0, 0.05, 1); }
+        .case-contents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; margin-top: 20px; }
+        .content-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px; text-align: center; border-bottom: 3px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .content-item img { width: 100%; object-fit: contain; } .content-item-name { font-size: 10px; font-weight: 700; margin-top: 5px; }
+
+        .points-box { flex: 1; background: rgba(28,24,43,0.8); border: 1px solid #2d2642; border-radius: 15px; padding: 25px; text-align: center; min-width: 250px;}
+        .points-btn { background: #ffea00; color: #000; border: none; padding: 12px; border-radius: 5px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s;}
+        .points-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,234,0,0.4); }
+
+        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; width: 100%; }
+        
+        /* TŁA KOLORÓW DLA SKINÓW */
+        .blue { border-bottom: 5px solid #0073ff !important; background: linear-gradient(0deg, rgba(0, 115, 255, 0.3) 0%, transparent 60%) !important; }
+        .purple { border-bottom: 5px solid #b000ff !important; background: linear-gradient(0deg, rgba(176, 0, 255, 0.3) 0%, transparent 60%) !important; }
+        .pink { border-bottom: 5px solid #ff00e5 !important; background: linear-gradient(0deg, rgba(255, 0, 229, 0.3) 0%, transparent 60%) !important; }
+        .red { border-bottom: 5px solid #ff003c !important; background: linear-gradient(0deg, rgba(255, 0, 60, 0.3) 0%, transparent 60%) !important; }
+        .gold { border-bottom: 5px solid #ffd700 !important; background: linear-gradient(0deg, rgba(255, 215, 0, 0.3) 0%, transparent 60%) !important; }
+        
+        .inv-item-wrapper { border: 1px solid #2d2642; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; cursor: pointer; }
+        .inv-item-wrapper:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.2); }
+        .inv-item-top { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 2; align-items: center; }
+        .inv-item-wear { font-size: 11px; font-weight: 800; color: #8b8b9e; background: rgba(0,0,0,0.6); padding: 4px 6px; border-radius: 4px; }
+        .inv-item-price { font-size: 12px; font-weight: 800; color: #00e5ff; background: rgba(0, 229, 255, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0, 229, 255, 0.2); }
+        .inv-item-image { height: 110px; display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+        .inv-item-image img { max-width: 80%; max-height: 80%; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: 0.3s; }
+        .inv-item-wrapper:hover .inv-item-image img { transform: scale(1.1) rotate(2deg); }
+        .inv-item-info { padding: 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .inv-item-st { color: #cf6a32; font-size: 11px; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; }
+        .inv-item-name { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2; }
+        .inv-sell-btn { background: linear-gradient(90deg, rgba(0,229,255,0.05), rgba(0,119,255,0.05)); color: #00e5ff; border: none; padding: 10px; cursor: pointer; font-weight: 800; transition: 0.3s; font-size: 12px; text-transform: uppercase; width:100%;}
+        .inv-sell-btn:hover { background: linear-gradient(90deg, #00e5ff, #0077ff); color: #fff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+
+        /* UPGRADER, TRADEUP, COINFLIP STYLES */
+        .upgrader-main { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 30px; background: rgba(17, 14, 26, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 16px; border: 1px solid #2d2642; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .upgrader-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 2px dashed #2d2642; }
+        .upgrader-center { flex: 1.2; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .upgrader-wheel { width: 220px; height: 220px; border-radius: 50%; position: relative; border: 4px solid #2d2642; box-shadow: 0 0 30px rgba(0,0,0,0.8); overflow: hidden; background: #110e1a; }
+        .upgrader-win-zone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: conic-gradient(#00e5ff 0%, #1c182b 0%); transition: background 0.3s; }
+        .upgrader-center-hole { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 170px; height: 170px; background: #0a0a10; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); z-index: 5; }
+        .upgrader-pointer-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; z-index: 10; transform: rotate(0deg); }
+        .upgrader-pointer { width: 4px; height: 25px; background: #fff; border-radius: 2px; box-shadow: 0 0 15px #fff; margin-top: -5px; }
+
+        .tradeup-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 800px; margin-bottom: 30px; }
+        .tradeup-slot { background: rgba(28,24,43,0.8); border: 2px dashed #483d6b; border-radius: 12px; height: 120px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .tradeup-slot:hover { border-color: #ff00e5; }
+        .tradeup-slot.filled { border-style: solid; border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); }
+
+        .coinflip-arena { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; background: rgba(28,24,43,0.8); padding: 40px; border-radius: 16px; border: 1px solid #2d2642; margin-bottom: 30px; }
+        .coin { width: 150px; height: 150px; background: radial-gradient(circle, #ffd700, #b8860b); border-radius: 50%; border: 5px solid #fff; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: 900; transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); transform-style: preserve-3d; }
+        .coin-inner { color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
+        /* CASE BATTLE */
+        .battle-setup { display: flex; flex-direction: column; width: 100%; max-width: 1200px; gap: 20px; align-items: center; }
+        .battle-queue-container { width: 100%; background: rgba(28,24,43,0.8); border: 1px solid #2d2642; border-radius: 12px; padding: 15px; box-sizing: border-box;}
+        .battle-queue { display: flex; gap: 10px; overflow-x: auto; min-height: 80px; align-items: center; padding-bottom: 10px; }
+        .queue-item { position: relative; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 8px; border: 1px solid transparent; }
+        .queue-item:hover { border-color: #ff003c; transform: translateY(-3px); }
+        .queue-item img { width: 60px; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
+        .queue-item .remove-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,0,60,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; opacity:0; border-radius:8px; transition:0.2s; }
+        .queue-item:hover .remove-overlay { opacity: 1; }
+        .battle-bots-selector { display: flex; gap: 15px; justify-content: center; margin-top: 10px; margin-bottom: 20px;}
+        .battle-lane { flex: 1; min-width: 250px; max-width: 300px; background: rgba(17, 14, 26, 0.9); border: 1px solid #2d2642; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; transition: box-shadow 0.4s; }
+        .battle-lane.winner { box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); }
+
+        /* BLACKJACK */
+        .bj-board { background: rgba(28,24,43,0.8); border: 1px solid #2d2642; border-radius: 16px; padding: 30px; width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+        .bj-area { width: 100%; display: flex; justify-content: space-between; align-items: stretch; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        .bj-side { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .bj-cards { display: flex; gap: -20px; margin: 15px 0; min-height: 120px; align-items: center; justify-content: center; }
+        .bj-card { width: 80px; height: 110px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: #000; box-shadow: -5px 0 10px rgba(0,0,0,0.5); margin-left: -30px; position: relative; border: 2px solid #ccc; transition: 0.3s transform; }
+        .bj-card:first-child { margin-left: 0; }
+        .bj-card.red { color: #ff003c; }
+        .bj-card-hidden { background: repeating-linear-gradient(45deg, #1c182b, #1c182b 10px, #2d2642 10px, #2d2642 20px); border-color: #00e5ff; color: transparent; }
+
+        /* EFFECTS */
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+        .confetti { position: fixed; width: 10px; height: 10px; z-index: 9999; pointer-events: none; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+        
+        .item { min-width: 170px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,.03); text-align: center; }
+        .item img { width: 130px; height: 90px; object-fit: contain; margin-bottom: 8px; }
+        .item span { font-size: 11px; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">MANI<span>UREK</span></div>
+        <ul class="nav-links">
+            <li><a id="navCases" class="active" onclick="switchTab('cases')">Skrzynie</a></li>
+            <li><a id="navBattle" onclick="switchTab('battle')">Bitwy</a></li>
+            <li><a id="navUpgrader" onclick="switchTab('upgrader')">Ulepsz</a></li>
+            <li><a id="navTradeup" onclick="switchTab('tradeup')">Kontrakty</a></li>
+            <li><a id="navCoinflip" onclick="switchTab('coinflip')">Coinflip</a></li>
+            <li><a id="navBlackjack" onclick="switchTab('blackjack')">Blackjack</a></li>
+            <li><a id="navPoints" onclick="switchTab('points')" style="color:#ffea00">Punkty</a></li>
+            <li><a onclick="openInventoryModal()">Ekwipunek</a></li>
+        </ul>
+        <div class="user-panel">
+            <div class="level-container" title="Wydawaj PLN, aby wbijać poziom! 1 PLN = 1 XP">
+                <div class="level-badge" id="levelDisplay">LVL 1</div>
+                <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+            </div>
+            <button class="btn-daily" id="btnDaily" onclick="claimDailyReward()" title="Codzienna Nagroda">🎁</button>
+            <div class="balance-points" id="pointsBalance">0 ⚡</div>
+            <div class="balance" id="walletBalance">1000.00 PLN</div>
+            <button class="deposit-btn" onclick="depositMoney()">Wpłać</button>
+            <div class="avatar" onclick="openInventoryModal()">👤</div>
+        </div>
+    </nav>
+
+    <!-- SKRZYNIE -->
+    <div class="game-area active" id="casesArea">
+        <h1>Wybierz skrzynię</h1>
+        <div class="cases-grid" id="casesGrid"></div>
+    </div>
+
+    <!-- BATTLE -->
+    <div class="game-area" id="battleArea">
+        <h1>Case Battle</h1>
+        <div id="battleSetup" class="battle-setup">
+            <div>
+                <h3 style="margin-top:0; text-align:center;">Liczba Botów lub Tryb Online</h3>
+                <div class="battle-bots-selector">
+                    <button class="mult-btn active" onclick="selectBattleBots(1, this)">1 Bot</button>
+                    <button class="mult-btn" onclick="selectBattleBots(2, this)">2 Boty</button>
+                    <button class="mult-btn" onclick="selectBattleBots(3, this)">3 Boty</button>
+                    <button class="mult-btn" style="border-color:#00e5ff; color:#00e5ff;" onclick="selectBattleBots('online', this)">GRAJ ONLINE 👤</button>
+                </div>
+            </div>
+            
+            <div class="battle-queue-container">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <h3 style="margin:0; color:#00e5ff;">Kolejka Skrzynek</h3>
+                    <div><span id="battleTotalCost" style="font-weight:800; margin-right:15px;">Koszt: 0.00 PLN</span><button class="mult-btn" onclick="clearBattleQueue()">Wyczyść</button></div>
+                </div>
+                <div id="battleQueue" class="battle-queue"><span style="color:#8b8b9e; width:100%; text-align:center;">Kliknij skrzynki poniżej, aby dodać je do bitwy.</span></div>
+            </div>
+            
+            <button class="btn-open" id="btnStartBattle" onclick="startBattle()" disabled>START BITWY</button>
+            <button class="btn-open" id="btnJoinOnline" onclick="joinOnlineBattle()" style="display:none; background:#ffea00; color:#000; width:50%; padding:15px; margin-top:10px;">DOŁĄCZ DO GRACZA ONLINE</button>
+
+            <h2 style="align-self:flex-start; margin-top:20px;">Dostępne Skrzynie</h2>
+            <div class="cases-grid" id="battleCasesGrid" style="width:100%;"></div>
+        </div>
+        
+        <div id="battleArenaContainer" style="display:none; width:100%; flex-direction:column; align-items:center;">
+            <div id="battleRoundInfo" style="font-size:26px; font-weight:900; color:#ff00e5; margin-bottom:20px;">Przygotowanie...</div>
+            <div id="battleArena" style="display:flex; gap:20px; flex-wrap:wrap; width:100%; justify-content:center;"></div>
+            <button class="btn-open" id="btnFinishBattle" onclick="finishBattle()" style="display:none; margin-top:30px;">ZAKOŃCZ I ODBIERZ NAGRODY</button>
+        </div>
+    </div>
+
+    <!-- BLACKJACK -->
+    <div class="game-area" id="blackjackArea">
+        <h1>Blackjack</h1>
+        <div class="bj-board" id="bjBoard">
+            <div class="bj-area">
+                <div class="bj-side" style="border-right: 1px solid rgba(255,255,255,0.1); padding-right: 20px;">
+                    <h2 style="color:#00e5ff; margin-top:0;">Twoje Karty</h2>
+                    <div class="bj-score" id="bjPlayerScore">0</div>
+                    <div class="bj-cards" id="bjPlayerCardsContainer"></div>
+                </div>
+                <div class="bj-side" style="padding-left: 20px;">
+                    <h2 style="color:#ff003c; margin-top:0;">Karty Krupiera</h2>
+                    <div class="bj-score" id="bjDealerScore" style="color:#ff003c; border-color:rgba(255,0,60,0.3); background:rgba(255,0,60,0.1);">0</div>
+                    <div class="bj-cards" id="bjDealerCardsContainer"></div>
+                </div>
+            </div>
+            <div id="bjGameStatus" style="font-size:24px; font-weight:900; margin-bottom:15px;"></div>
+            <div class="bj-controls" id="bjControls" style="display:none;">
+                <button class="btn-open" style="background:linear-gradient(45deg, #00e5ff, #0077ff); padding:10px 40px;" onclick="hitBj()">DOBIERZ</button>
+                <button class="btn-open" style="background:#2d2642; box-shadow:none; border:1px solid #483d6b; padding:10px 40px;" onclick="standBj()">CZEKAJ</button>
+            </div>
+            <div id="bjSetupControls" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">Zastawione Skiny: <span id="bjTotalBet" style="color:#00e5ff;">0.00 PLN</span></div>
+                <div class="bj-bet-container" id="bjBetContainer" style="width:100%; border:1px dashed #483d6b; border-radius:12px; padding:15px; display:flex; gap:10px; overflow-x:auto; min-height:100px; align-items:center; justify-content:center; margin-bottom:15px;">
+                    <span style="color:#8b8b9e; font-style:italic;">Kliknij skiny w ekwipunku poniżej, aby zagrać.</span>
+                </div>
+                <button class="btn-open" id="btnStartBj" onclick="startBj()" disabled>ROZDAJ KARTY</button>
+                <button class="mult-btn" onclick="clearBjBet()" style="margin-top:15px;">Wyczyść stół</button>
+            </div>
+        </div>
+        <h2 style="align-self:flex-start; margin-top:20px;">Twój Ekwipunek</h2>
+        <div id="bjInventoryGrid" class="inventory-grid"></div>
+    </div>
+
+    <!-- PUNKTY -->
+    <div class="game-area" id="pointsArea" style="flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:20px;">
+        <div class="points-box" style="flex:2;">
+            <h3 style="color:#ffea00; margin-top:0;">Sklep Punktowy</h3>
+            <div id="pointsShopGrid" class="case-contents-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));"></div>
+        </div>
+        <div class="points-box">
+            <h3 style="color:#ffea00; margin-top:0;">Losowanie Gacha</h3>
+            <input type="number" id="gachaInput" style="width:80%; padding:10px; margin:10px 0; background:#0d0b14; color:#fff; border:1px solid #483d6b; border-radius:8px; text-align:center;" placeholder="Min. 100 ⚡">
+            <button class="points-btn" onclick="rollPointsGacha()">LOSUJ</button>
+            <div id="gachaResult" style="margin-top:20px; font-weight:bold;"></div>
+        </div>
+        <div class="points-box">
+            <h3 style="color:#00e5ff; margin-top:0;">Wymiana na PLN</h3>
+            <p style="font-size:12px; color:#8b8b9e;">100 ⚡ = 1.00 PLN</p>
+            <input type="number" id="exchangeInput" style="width:80%; padding:10px; margin:10px 0; background:#0d0b14; color:#fff; border:1px solid #483d6b; border-radius:8px; text-align:center;" placeholder="Ilość ⚡">
+            <button class="points-btn" style="background:#00e5ff;" onclick="exchangePoints()">WYMIEŃ</button>
+        </div>
+    </div>
+
+    <!-- UPGRADER -->
+    <div class="game-area" id="upgraderArea">
+        <div class="upgrader-main">
+            <div class="upgrader-side" id="upgradeInputBox"><div class="placeholder-text">Wybierz z dołu</div></div>
+            <div class="upgrader-center">
+                <div class="upgrader-wheel">
+                    <div class="upgrader-win-zone" id="winZone"></div>
+                    <div class="upgrader-center-hole"><div class="upgrader-chance" id="chanceDisplay" style="font-size:24px; font-weight:900; color:#fff;">0.00%</div></div>
+                    <div class="upgrader-pointer-container" id="upgraderPointerContainer"><div class="upgrader-pointer"></div></div>
+                </div>
+                <div class="upgrader-multipliers" style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="mult-btn" onclick="setMultiplier(1.5, this)">1.5x</button>
+                    <button class="mult-btn" onclick="setMultiplier(2, this)">2x</button>
+                    <button class="mult-btn" onclick="setMultiplier(5, this)">5x</button>
+                    <button class="mult-btn" onclick="setMultiplier(10, this)">10x</button>
+                </div>
+                <div id="upgraderResultMsg" style="font-size:20px; font-weight:bold; margin-top:10px; height:30px;"></div>
+                <button class="btn-open" id="startUpgradeBtn" onclick="startUpgrade()" style="width:100%; margin-top:10px;" disabled>ULEPSZ</button>
+            </div>
+            <div class="upgrader-side" id="upgradeTargetBox"><div class="placeholder-text">Wybierz mnożnik</div></div>
+        </div>
+        <h2 style="align-self:flex-start; margin-top:40px;">Wybierz przedmiot z ekwipunku</h2>
+        <div id="upgraderInventoryGrid" class="inventory-grid"></div>
+    </div>
+
+    <!-- TRADE UP -->
+    <div class="game-area" id="tradeupArea">
+        <h1>Kontrakt Wymiany</h1>
+        <div class="tradeup-grid" id="tradeupGrid"></div>
+        <div style="font-size:20px; font-weight:bold; margin-bottom:20px;">Wybrano: <span id="tradeupCount" style="color:#00e5ff;">0</span> / 10</div>
+        <button class="btn-open" id="btnDoTradeup" onclick="executeTradeup()" disabled>WYKONAJ</button>
+        <h2 style="align-self:flex-start; margin-top:40px;">Ekwipunek</h2>
+        <div id="tradeupInventoryGrid" class="inventory-grid"></div>
+    </div>
+
+    <!-- COINFLIP -->
+    <div class="game-area" id="coinflipArea">
+        <h1>Coinflip</h1>
+        <div class="coinflip-arena">
+            <div class="coinflip-side">
+                <h3 style="color:#00e5ff;">Twój Skin</h3>
+                <div id="cfPlayerSlot" style="width:160px; height:180px; border:2px dashed #483d6b; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">Wybierz z dołu</div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div class="coin" id="cfCoin"><div class="coin-inner">CT</div></div>
+                <button class="btn-open" id="btnDoCoinflip" onclick="executeCoinflip()" disabled style="padding:10px 20px; font-size:16px;">RZUT</button>
+            </div>
+            <div class="coinflip-side">
+                <h3 style="color:#ff003c;">Skin Bota</h3>
+                <div id="cfBotSlot" style="width:160px; height:180px; border:2px dashed #483d6b; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;">Czekam...</div>
+            </div>
+        </div>
+        <h2 style="align-self:flex-start;">Wybierz skina do gry</h2>
+        <div id="coinflipInventoryGrid" class="inventory-grid"></div>
+    </div>
+
+    <!-- MODAL RULETKI I PODGLĄD SKRZYNI -->
+    <div class="modal-overlay" id="rouletteModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeRouletteModal()">✖</span>
+            <h2 id="rouletteTitleDisplay" style="text-transform:uppercase; margin-top:0;">Otwieranie</h2>
+            <div id="caseQuantitySelector" style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
+                <button class="mult-btn active" onclick="setRollQuantity(1, this)">1x</button>
+                <button class="mult-btn" onclick="setRollQuantity(2, this)">2x</button>
+                <button class="mult-btn" onclick="setRollQuantity(3, this)">3x</button>
+            </div>
+            <div id="rouletteContainers"></div>
+            <div id="result" style="text-align:center; font-size:20px; font-weight:900; margin:20px 0; min-height:40px;">Gotowy?</div>
+            <button class="btn-open" id="openBtn" onclick="openCase()" style="width:100%">OTWÓRZ</button>
+            <div class="result-actions" id="resultActions" style="display:none; justify-content:center; gap:20px; margin-top:20px;">
+                <button class="mult-btn" style="background:#00e5ff; color:#000;" onclick="sellWonItem()">Sprzedaj za <span id="sellPriceDisplay"></span> PLN</button>
+                <button class="mult-btn" onclick="keepWonItem()">Zatrzymaj</button>
+            </div>
+            
+            <!-- PODGLĄD ZAWARTOŚCI SKRZYNI -->
+            <div style="margin-top: 30px; width: 100%; max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; box-sizing: border-box;">
+                <h3 style="text-align:center; color:#8b8b9e; text-transform:uppercase; margin-top: 0;">Zawartość skrzyni</h3>
+                <div id="caseContentsGrid" class="case-contents-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EKWIPUNKU -->
+    <div class="modal-overlay" id="inventoryModal" onclick="closeModalOnOutsideClick(event, 'inventoryModal', closeInventoryModal)">
+        <div class="modal-content inventory-modal">
+            <span class="close-modal" onclick="closeInventoryModal()">✖</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2d2642; padding-bottom:20px; margin-bottom:20px;">
+                <h2 style="margin:0;">Ekwipunek</h2>
+                <div>
+                    <span style="font-size:15px; color:#8b8b9e; font-weight:600; margin-right:20px;">Wartość: <b id="inventoryTotalValue" style="color:#00e5ff;">0.00 PLN</b></span>
+                    <button class="mult-btn" style="border-color:#ff003c; color:#ff003c;" onclick="sellAllInventory()">Sprzedaj Wszystko</button>
+                </div>
+            </div>
+            <div id="inventoryGrid" class="inventory-grid"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // =========================================================================
+        // ⚠️ TUTAJ WKLEJ SWOJĄ PEŁNĄ BAZĘ DANYCH (casesData i localImages) ⚠️
+        // =========================================================================
+        const localCaseImages = { "Skrzynia AK-47": "AK.png", "Skrzynia M4A1-S": "M4A1-S.png", "Skrzynia M4A4": "M4.png",
+            "Skrzynia AWP": "AWP.png", "Skrzynia Karambit": "Karambit.png", "Skrzynia Kos": "skrzynka.jpg",
+            "Skrzynia Deagle": "Deagle.png", "Skrzynia AUG": "skrzynka.jpg", "Skrzynia Galil AR": "skrzynka.jpg",
+            "Skrzynia Five-SeveN": "skrzynka.jpg", "Skrzynia FAMAS": "skrzynka.jpg", "Skrzynia Dual Berettas": "skrzynka.jpg",
+            "Skrzynia CZ75-Auto": "skrzynka.jpg", "Skrzynia FAKEE": "fakee.png", "Skrzynia TOXIC": "toxic.png",
+            "Skrzynia VENOM": "skrzynka.jpg", "Skrzynia Glock-18": "Glock.png", "Skrzynia USP-S": "Usp.png" };
+        const casesData = [
+            { id: 'ak47', name: 'Skrzynia AK-47', price: 35.00, items: [
+                { name: "AK-47 | Predator", tier: "blue" }, { name: "AK-47 | Jungle Spray", tier: "blue" }, { name: "AK-47 | Safari Mesh", tier: "blue" }, { name: "AK-47 | Baroque Purple", tier: "blue" }, { name: "AK-47 | Black Laminate", tier: "blue" }, { name: "AK-47 | Elite Build", tier: "blue" }, { name: "AK-47 | Uncharted", tier: "blue" }, { name: "AK-47 | Emerald Pinstripe", tier: "blue" }, { name: "AK-47 | Steel Delta", tier: "blue" },
+                { name: "AK-47 | First Class", tier: "purple" }, { name: "AK-47 | Blue Laminate", tier: "purple" }, { name: "AK-47 | Orbit Mk01", tier: "purple" }, { name: "AK-47 | Safety Net", tier: "purple" }, { name: "AK-47 | Rat Rod", tier: "purple" }, { name: "AK-47 | Slate", tier: "purple" },
+                { name: "AK-47 | Jet Set", tier: "pink" }, { name: "AK-47 | Hydroponic", tier: "pink" }, { name: "AK-47 | Case Hardened", tier: "pink" }, { name: "AK-47 | Red Laminate", tier: "pink" }, { name: "AK-47 | Redline", tier: "pink" }, { name: "AK-47 | Cartel", tier: "pink" }, { name: "AK-47 | Frontside Misty", tier: "pink" }, { name: "AK-47 | Point Disarray", tier: "pink" }, { name: "AK-47 | Phantom Disruptor", tier: "pink" }, { name: "AK-47 | Panthera onca", tier: "pink" }, { name: "AK-47 | Ice Coaled", tier: "pink" },
+                { name: "AK-47 | Fire Serpent", tier: "red" }, { name: "AK-47 | Vulcan", tier: "red" }, { name: "AK-47 | Jaguar", tier: "red" }, { name: "AK-47 | Wasteland Rebel", tier: "red" }, { name: "AK-47 | Aquamarine Revenge", tier: "red" }, { name: "AK-47 | Fuel Injector", tier: "red" }, { name: "AK-47 | Neon Revolution", tier: "red" }, { name: "AK-47 | Bloodsport", tier: "red" }, { name: "AK-47 | The Empress", tier: "red" }, { name: "AK-47 | Neon Rider", tier: "red" }, { name: "AK-47 | Asiimov", tier: "red" }, { name: "AK-47 | Wild Lotus", tier: "red" }, { name: "AK-47 | Legion of Anubis", tier: "red" }, { name: "AK-47 | X-Ray", tier: "red" }, { name: "AK-47 | Gold Arabesque", tier: "red" }, { name: "AK-47 | Leet Museo", tier: "red" }, { name: "AK-47 | Nightwish", tier: "red" }, { name: "AK-47 | Head Shot", tier: "red" }, { name: "AK-47 | Inheritance", tier: "red" }
+            ] },
+            { id: 'm4a1s', name: 'Skrzynia M4A1-S', price: 35.00, items: [
+                { name: "M4A1-S | Fizzy POP", tier: "blue" }, { name: "M4A1-S | Briefing", tier: "blue" }, { name: "M4A1-S | VariCamo", tier: "blue" }, { name: "M4A1-S | Mud-Spec", tier: "blue" }, { name: "M4A1-S | Moss Quartz", tier: "blue" }, { name: "M4A1-S | Boreal Forest", tier: "blue" },
+                { name: "M4A1-S | Guardian", tier: "purple" }, { name: "M4A1-S | Emphorosaur-S", tier: "purple" }, { name: "M4A1-S | Night Terror", tier: "purple" }, { name: "M4A1-S | Flashback", tier: "purple" }, { name: "M4A1-S | Basilisk", tier: "purple" }, { name: "M4A1-S | Bright Water", tier: "purple" }, { name: "M4A1-S | Dark Water", tier: "purple" }, { name: "M4A1-S | Nitro", tier: "purple" }, { name: "M4A1-S | Blood Tiger", tier: "purple" },
+                { name: "M4A1-S | Black Lotus", tier: "pink" }, { name: "M4A1-S | Blue Phosphor", tier: "pink" }, { name: "M4A1-S | Control Panel", tier: "pink" }, { name: "M4A1-S | Nightmare", tier: "pink" }, { name: "M4A1-S | Leaded Glass", tier: "pink" }, { name: "M4A1-S | Decimator", tier: "pink" }, { name: "M4A1-S | Atomic Alloy", tier: "pink" }, { name: "M4A1-S | Hot Rod", tier: "pink" }, { name: "M4A1-S | Knight", tier: "pink" }, { name: "M4A1-S | Icarus Fell", tier: "pink" },
+                { name: "M4A1-S | Imminent Danger", tier: "red" }, { name: "M4A1-S | Welcome to the Jungle", tier: "red" }, { name: "M4A1-S | Printstream", tier: "red" }, { name: "M4A1-S | Player Two", tier: "red" }, { name: "M4A1-S | Mecha Industries", tier: "red" }, { name: "M4A1-S | Chantico's Fire", tier: "red" }, { name: "M4A1-S | Golden Coil", tier: "red" }, { name: "M4A1-S | Hyper Beast", tier: "red" }, { name: "M4A1-S | Cyrex", tier: "red" }, { name: "M4A1-S | Master Piece", tier: "red" }
+            ] },
+            { id: 'm4a4', name: 'Skrzynia M4A4', price: 35.00, items: [
+                { name: "M4A4 | Desert Storm", tier: "blue" }, { name: "M4A4 | Jungle Tiger", tier: "blue" }, { name: "M4A4 | Tornado", tier: "blue" }, { name: "M4A4 | Urban DDPAT", tier: "blue" }, { name: "M4A4 | Mainframe", tier: "blue" }, { name: "M4A4 | Dark Blossom", tier: "blue" }, { name: "M4A4 | Faded Zebra", tier: "blue" }, { name: "M4A4 | Converter", tier: "blue" }, { name: "M4A4 | Magnesium", tier: "blue" }, { name: "M4A4 | Global Offensive", tier: "blue" }, { name: "M4A4 | Poly Mag", tier: "blue" },
+                { name: "M4A4 | Radiation Hazard", tier: "purple" }, { name: "M4A4 | Modern Hunter", tier: "purple" }, { name: "M4A4 | Daybreak", tier: "purple" }, { name: "M4A4 | Zirka", tier: "purple" }, { name: "M4A4 | Evil Daimyo", tier: "purple" }, { name: "M4A4 | Griffin", tier: "purple" }, { name: "M4A4 | Red DDPAT", tier: "purple" }, { name: "M4A4 | Spider Lily", tier: "purple" }, { name: "M4A4 | Etch Lord", tier: "purple" },
+                { name: "M4A4 | Poseidon", tier: "pink" }, { name: "M4A4 | Desolate Space", tier: "pink" }, { name: "M4A4 | 龍王 (Dragon King)", tier: "pink" }, { name: "M4A4 | Hellfire", tier: "pink" }, { name: "M4A4 | Tooth Fairy", tier: "pink" }, { name: "M4A4 | Cyber Security", tier: "pink" }, { name: "M4A4 | X-Ray", tier: "pink" }, { name: "M4A4 | Desert-Strike", tier: "pink" }, { name: "M4A4 | The Battlestar", tier: "pink" },
+                { name: "M4A4 | Asiimov", tier: "red" }, { name: "M4A4 | Royal Paladin", tier: "red" }, { name: "M4A4 | Buzz Kill", tier: "red" }, { name: "M4A4 | Neo-Noir", tier: "red" }, { name: "M4A4 | The Emperor", tier: "red" }, { name: "M4A4 | In Living Color", tier: "red" }, { name: "M4A4 | The Coalition", tier: "red" }, { name: "M4A4 | Temukau", tier: "red" }, { name: "M4A4 | Eye of Horus", tier: "red" }, { name: "M4A4 | Howl", tier: "red" }
+            ] },
+            { id: 'awp', name: 'Skrzynia AWP', price: 45.00, items: [
+                { name: "AWP | Safari Mesh", tier: "blue" }, { name: "AWP | Sun in Leo", tier: "blue" }, { name: "AWP | Snake Camo", tier: "blue" }, { name: "AWP | Acheron", tier: "blue" }, { name: "AWP | Capillary", tier: "blue" }, { name: "AWP | Black Nile", tier: "blue" }, { name: "AWP | Pit Viper", tier: "blue" },
+                { name: "AWP | Pink DDPAT", tier: "purple" }, { name: "AWP | Worm God", tier: "purple" }, { name: "AWP | Phobos", tier: "purple" }, { name: "AWP | PAW", tier: "purple" }, { name: "AWP | Atheris", tier: "purple" }, { name: "AWP | Exoskeleton", tier: "purple" }, { name: "AWP | POP AWP", tier: "purple" },
+                { name: "AWP | BOOM", tier: "pink" }, { name: "AWP | Graphite", tier: "pink" }, { name: "AWP | Electric Hive", tier: "pink" }, { name: "AWP | Redline", tier: "pink" }, { name: "AWP | Corticera", tier: "pink" }, { name: "AWP | Elite Build", tier: "pink" }, { name: "AWP | Fever Dream", tier: "pink" }, { name: "AWP | Mortis", tier: "pink" }, { name: "AWP | Duality", tier: "pink" }, { name: "AWP | Chromatic Aberration", tier: "pink" },
+                { name: "AWP | Lightning Strike", tier: "red" }, { name: "AWP | Asiimov", tier: "red" }, { name: "AWP | Man-o'-war", tier: "red" }, { name: "AWP | Hyper Beast", tier: "red" }, { name: "AWP | Oni Taiji", tier: "red" }, { name: "AWP | Neo-Noir", tier: "red" }, { name: "AWP | Wildfire", tier: "red" }, { name: "AWP | Chrome Cannon", tier: "red" }, { name: "AWP | Fade", tier: "red" },
+                { name: "AWP | Desert Hydra", tier: "gold" }, { name: "AWP | The Prince", tier: "gold" }, { name: "AWP | Gungnir", tier: "gold" }, { name: "AWP | Medusa", tier: "gold" }, { name: "AWP | Dragon Lore", tier: "gold" }
+            ] },
+            { id: 'karambit', name: 'Skrzynia Karambit', price: 100.00, items: [
+                { name: "★ Karambit | Urban Masked", tier: "gold" }, { name: "★ Karambit | Stained", tier: "gold" }, { name: "★ Karambit | Slaughter", tier: "gold" }, { name: "★ Karambit | Scorched", tier: "gold" }, { name: "★ Karambit | Safari Mesh", tier: "gold" }, { name: "★ Karambit | Night", tier: "gold" }, { name: "★ Karambit | Forest DDPAT", tier: "gold" }, { name: "★ Karambit | Fade", tier: "gold" }, { name: "★ Karambit | Crimson Web", tier: "gold" }, { name: "★ Karambit | Case Hardened", tier: "gold" }, { name: "★ Karambit | Boreal Forest", tier: "gold" }, { name: "★ Karambit | Blue Steel", tier: "gold" }, { name: "★ Karambit | Ultraviolet", tier: "gold" }, { name: "★ Karambit | Rust Coat", tier: "gold" }, { name: "★ Karambit | Tiger Tooth", tier: "gold" }, { name: "★ Karambit | Marble Fade", tier: "gold" }, { name: "★ Karambit | Doppler", tier: "gold" }, { name: "★ Karambit | Damascus Steel", tier: "gold" }, { name: "★ Karambit | Freehand", tier: "gold" }, { name: "★ Karambit | Bright Water", tier: "gold" }, { name: "★ Karambit | Autotronic", tier: "gold" }, { name: "★ Karambit | Gamma Doppler", tier: "gold" }, { name: "★ Karambit | Black Laminate", tier: "gold" }, { name: "★ Karambit | Lore", tier: "gold" }
+            ] },
+            { id: 'mixed_knives', name: 'Skrzynia Kos', price: 150.00, items: [
+                { name: "★ Flip Knife | Urban Masked", tier: "gold" }, { name: "★ Flip Knife | Stained", tier: "gold" }, { name: "★ Flip Knife | Slaughter", tier: "gold" }, { name: "★ Flip Knife | Scorched", tier: "gold" }, { name: "★ Flip Knife | Safari Mesh", tier: "gold" }, { name: "★ Flip Knife | Night", tier: "gold" }, { name: "★ Flip Knife | Fade", tier: "gold" }, { name: "★ Flip Knife | Crimson Web", tier: "gold" }, { name: "★ Flip Knife | Case Hardened", tier: "gold" }, { name: "★ Flip Knife | Boreal Forest", tier: "gold" }, { name: "★ Flip Knife | Blue Steel", tier: "gold" }, { name: "★ Flip Knife | Rust Coat", tier: "gold" }, { name: "★ Flip Knife | Tiger Tooth", tier: "gold" }, { name: "★ Flip Knife | Marble Fade", tier: "gold" }, { name: "★ Flip Knife | Doppler", tier: "gold" }, { name: "★ Flip Knife | Damascus Steel", tier: "gold" }, { name: "★ Flip Knife | Lore", tier: "gold" },
+                { name: "★ Bowie Knife | Slaughter", tier: "gold" }, { name: "★ Bowie Knife | Scorched", tier: "gold" }, { name: "★ Bowie Knife | Safari Mesh", tier: "gold" }, { name: "★ Bowie Knife | Night", tier: "gold" }, { name: "★ Bowie Knife | Case Hardened", tier: "gold" }, { name: "★ Bowie Knife | Doppler", tier: "gold" }, { name: "★ Bowie Knife | Marble Fade", tier: "gold" },
+                { name: "★ Skeleton Knife | Safari Mesh", tier: "gold" }, { name: "★ Skeleton Knife | Urban Masked", tier: "gold" }, { name: "★ Skeleton Knife | Night Stripe", tier: "gold" }, { name: "★ Skeleton Knife | Case Hardened", tier: "gold" }, { name: "★ Skeleton Knife | Crimson Web", tier: "gold" }, { name: "★ Skeleton Knife | Slaughter", tier: "gold" }, { name: "★ Skeleton Knife | Fade", tier: "gold" },
+                { name: "★ M9 Bayonet | Safari Mesh", tier: "gold" }, { name: "★ M9 Bayonet | Night", tier: "gold" }, { name: "★ M9 Bayonet | Fade", tier: "gold" }, { name: "★ M9 Bayonet | Crimson Web", tier: "gold" }, { name: "★ M9 Bayonet | Case Hardened", tier: "gold" }, { name: "★ M9 Bayonet | Lore", tier: "gold" }, { name: "★ M9 Bayonet | Tiger Tooth", tier: "gold" }, { name: "★ M9 Bayonet | Doppler", tier: "gold" }
+            ] },
+            { id: 'deagle', name: 'Skrzynia Deagle', price: 30.00, items: [
+                { name: "Desert Eagle | Bronze Deco", tier: "blue" }, { name: "Desert Eagle | Meteorite", tier: "blue" }, { name: "Desert Eagle | Urban Rubble", tier: "blue" }, { name: "Desert Eagle | Mudder", tier: "blue" }, { name: "Desert Eagle | Urban DDPAT", tier: "blue" }, { name: "Desert Eagle | Night", tier: "blue" }, { name: "Desert Eagle | Corinthian", tier: "blue" }, { name: "Desert Eagle | Oxide Blaze", tier: "blue" }, { name: "Desert Eagle | Blue Ply", tier: "blue" }, { name: "Desert Eagle | Sputnik", tier: "blue" }, { name: "Desert Eagle | Trigger Discipline", tier: "blue" }, { name: "Desert Eagle | Brass", tier: "blue" },
+                { name: "Desert Eagle | Conspiracy", tier: "purple" }, { name: "Desert Eagle | Directive", tier: "purple" }, { name: "Desert Eagle | Naga", tier: "purple" }, { name: "Desert Eagle | Heirloom", tier: "purple" }, { name: "Desert Eagle | Pilot", tier: "purple" }, { name: "Desert Eagle | Night Heist", tier: "purple" }, { name: "Desert Eagle | Light Rail", tier: "purple" }, { name: "Desert Eagle | Crimson Web", tier: "purple" },
+                { name: "Desert Eagle | Ocean Drive", tier: "pink" }, { name: "Desert Eagle | Code Red", tier: "pink" }, { name: "Desert Eagle | Mecha Industries", tier: "pink" }, { name: "Desert Eagle | Kumicho Dragon", tier: "pink" }, { name: "Desert Eagle | Cobalt Disruption", tier: "pink" }, { name: "Desert Eagle | Hypnotic", tier: "pink" },
+                { name: "Desert Eagle | Printstream", tier: "red" }, { name: "Desert Eagle | Golden Koi", tier: "red" }, { name: "Desert Eagle | Fennec Fox", tier: "red" }, { name: "Desert Eagle | Sunset Storm 壱", tier: "red" }, { name: "Desert Eagle | Hand Cannon", tier: "red" }, { name: "Desert Eagle | Blaze", tier: "red" }, { name: "Desert Eagle | Emerald Jörmungandr", tier: "red" }, { name: "Desert Eagle | Midnight Storm", tier: "red" }
+            ] },
+            { id: 'aug', name: 'Skrzynia AUG', price: 25.00, items: [
+                { name: "AUG | Sand Storm", tier: "blue" }, { name: "AUG | Torque", tier: "blue" }, { name: "AUG | Plague", tier: "blue" }, { name: "AUG | Amber Fade", tier: "blue" }, { name: "AUG | Carved Jade", tier: "blue" }, { name: "AUG | Tom Cat", tier: "blue" }, { name: "AUG | Amber Slipstream", tier: "blue" }, { name: "AUG | Triqua", tier: "blue" }, { name: "AUG | Ricochet", tier: "blue" }, { name: "AUG | Wings", tier: "blue" }, { name: "AUG | Anodized Navy", tier: "blue" }, { name: "AUG | Copperhead", tier: "blue" }, { name: "AUG | Withered Wood", tier: "blue" }, { name: "AUG | Radiation Hazard", tier: "blue" }, { name: "AUG | Condemned", tier: "blue" }, { name: "AUG | Snake Pit", tier: "blue" }, { name: "AUG | Surveillance", tier: "blue" }, { name: "AUG | Navy Murano", tier: "blue" }, { name: "AUG | Sweeper", tier: "blue" }, { name: "AUG | Daedalus", tier: "blue" }, { name: "AUG | Contractor", tier: "blue" }, { name: "AUG | Storm", tier: "blue" }, { name: "AUG | Colony", tier: "blue" },
+                { name: "AUG | Bengal Tiger", tier: "purple" }, { name: "AUG | Arctic Wolf", tier: "purple" }, { name: "AUG | Midnight Lily", tier: "purple" }, { name: "AUG | Flame Jörmungandr", tier: "purple" }, { name: "AUG | Random Access", tier: "purple" }, { name: "AUG | Aristocrat", tier: "purple" }, { name: "AUG | Hot Rod", tier: "purple" },
+                { name: "AUG | Death by Puppy", tier: "pink" }, { name: "AUG | Momentum", tier: "pink" }, { name: "AUG | Stymphalian", tier: "pink" }, { name: "AUG | Syd Mead", tier: "pink" }, { name: "AUG | Fleet Flock", tier: "pink" },
+                { name: "AUG | Chameleon", tier: "red" }, { name: "AUG | Akihabara Accept", tier: "red" }
+            ] },
+            { id: 'galil', name: 'Skrzynia Galil AR', price: 20.00, items: [
+                { name: "Galil AR | Tuxedo", tier: "blue" }, { name: "Galil AR | Aqua Terrace", tier: "blue" }, { name: "Galil AR | Shattered", tier: "blue" }, { name: "Galil AR | Blue Titanium", tier: "blue" }, { name: "Galil AR | Sandstorm", tier: "blue" }, { name: "Galil AR | Kami", tier: "blue" }, { name: "Galil AR | Rocket Pop", tier: "blue" }, { name: "Galil AR | Black Sand", tier: "blue" }, { name: "Galil AR | Akoben", tier: "blue" }, { name: "Galil AR | Vandal", tier: "blue" },
+                { name: "Galil AR | Dusk Ruins", tier: "purple" }, { name: "Galil AR | Amber Fade", tier: "purple" }, { name: "Galil AR | Destroyer", tier: "purple" }, { name: "Galil AR | Cerberus", tier: "purple" }, { name: "Galil AR | Orange DDPAT", tier: "purple" }, { name: "Galil AR | Stone Cold", tier: "purple" }, { name: "Galil AR | Firefight", tier: "purple" }, { name: "Galil AR | Crimson Tsunami", tier: "purple" }, { name: "Galil AR | Signal", tier: "purple" }, { name: "Galil AR | Connexion", tier: "purple" },
+                { name: "Galil AR | Phoenix Blacklight", tier: "pink" }, { name: "Galil AR | CAUTION!", tier: "pink" }, { name: "Galil AR | Eco", tier: "pink" }, { name: "Galil AR | Sugar Rush", tier: "pink" }, { name: "Galil AR | Chromatic Aberration", tier: "pink" },
+                { name: "Galil AR | Chatterbox", tier: "red" }
+            ] },
+            { id: 'fiveseven', name: 'Skrzynia Five-SeveN', price: 20.00, items: [
+                { name: "Five-SeveN | Coolant", tier: "blue" }, { name: "Five-SeveN | Candy Apple", tier: "blue" }, { name: "Five-SeveN | Orange Peel", tier: "blue" }, { name: "Five-SeveN | Hot Shot", tier: "blue" }, { name: "Five-SeveN | Withered Vine", tier: "blue" }, { name: "Five-SeveN | Nitro", tier: "blue" }, { name: "Five-SeveN | Nightshade", tier: "blue" }, { name: "Five-SeveN | Kami", tier: "blue" }, { name: "Five-SeveN | Urban Hazard", tier: "blue" },
+                { name: "Five-SeveN | Violent Daimyo", tier: "purple" }, { name: "Five-SeveN | Scumbria", tier: "purple" }, { name: "Five-SeveN | Capillary", tier: "purple" }, { name: "Five-SeveN | Flame Test", tier: "purple" }, { name: "Five-SeveN | Crimson Blossom", tier: "purple" }, { name: "Five-SeveN | Scrawl", tier: "purple" }, { name: "Five-SeveN | Neon Kimono", tier: "purple" }, { name: "Five-SeveN | Case Hardened", tier: "purple" }, { name: "Five-SeveN | Copper Galaxy", tier: "purple" }, { name: "Five-SeveN | Retribution", tier: "purple" },
+                { name: "Five-SeveN | Triumvirate", tier: "pink" }, { name: "Five-SeveN | Buddy", tier: "pink" }, { name: "Five-SeveN | Fowl Play", tier: "pink" }, { name: "Five-SeveN | Boost Protocol", tier: "pink" }, { name: "Five-SeveN | Hybrid", tier: "pink" }, { name: "Five-SeveN | Monkey Business", tier: "pink" }, { name: "Five-SeveN | Fall Hazard", tier: "pink" },
+                { name: "Five-SeveN | Fairy Tale", tier: "red" }, { name: "Five-SeveN | Hyper Beast", tier: "red" }, { name: "Five-SeveN | Angry Mob", tier: "red" }, { name: "Five-SeveN | Rooster", tier: "red" }
+            ] },
+            { id: 'famas', name: 'Skrzynia FAMAS', price: 25.00, items: [
+                { name: "FAMAS | Contrast Spray", tier: "blue" }, { name: "FAMAS | Colony", tier: "blue" }, { name: "FAMAS | Night Borre", tier: "blue" }, { name: "FAMAS | Faulty Wiring", tier: "blue" }, { name: "FAMAS | Cyanospatter", tier: "blue" }, { name: "FAMAS | CaliCamo", tier: "blue" }, { name: "FAMAS | Teardown", tier: "blue" }, { name: "FAMAS | Doomkitty", tier: "blue" }, { name: "FAMAS | Hexane", tier: "blue" }, { name: "FAMAS | Survivor Z", tier: "blue" },
+                { name: "FAMAS | Macabre", tier: "purple" }, { name: "FAMAS | Crypsis", tier: "purple" }, { name: "FAMAS | Decommissioned", tier: "purple" }, { name: "FAMAS | Sundown", tier: "purple" }, { name: "FAMAS | Dark Water", tier: "purple" }, { name: "FAMAS | Meow 36", tier: "purple" }, { name: "FAMAS | Spitfire", tier: "purple" }, { name: "FAMAS | Styx", tier: "purple" }, { name: "FAMAS | Pulse", tier: "purple" }, { name: "FAMAS | Sergeant", tier: "purple" }, { name: "FAMAS | Neural Net", tier: "purple" },
+                { name: "FAMAS | Valence", tier: "pink" }, { name: "FAMAS | Prime Conspiracy", tier: "pink" }, { name: "FAMAS | ZX Spectron", tier: "pink" }, { name: "FAMAS | Afterimage", tier: "pink" }, { name: "FAMAS | Djinn", tier: "pink" },
+                { name: "FAMAS | Mecha Industries", tier: "red" }, { name: "FAMAS | Eye of Athena", tier: "red" }, { name: "FAMAS | Meltdown", tier: "red" }, { name: "FAMAS | Rapid Eye Movement", tier: "red" }, { name: "FAMAS | Waters of Nephthys", tier: "red" }, { name: "FAMAS | Roll Cage", tier: "red" }, { name: "FAMAS | Commemoration", tier: "red" }
+            ] },
+            { id: 'dualberettas', name: 'Skrzynia Dual Berettas', price: 20.00, items: [
+                { name: "Dual Berettas | Moon in Libra", tier: "blue" }, { name: "Dual Berettas | Anodized Navy", tier: "blue" }, { name: "Dual Berettas | Black Limba", tier: "blue" }, { name: "Dual Berettas | Panther", tier: "blue" }, { name: "Dual Berettas | Retribution", tier: "blue" }, { name: "Dual Berettas | Dualing Dragons", tier: "blue" }, { name: "Dual Berettas | Cartel", tier: "blue" }, { name: "Dual Berettas | Ventilators", tier: "blue" }, { name: "Dual Berettas | Shred", tier: "blue" }, { name: "Dual Berettas | Elite 1.6", tier: "blue" },
+                { name: "Dual Berettas | Emerald", tier: "purple" }, { name: "Dual Berettas | Balance", tier: "purple" }, { name: "Dual Berettas | Drift Wood", tier: "purple" }, { name: "Dual Berettas | Hideout", tier: "purple" }, { name: "Dual Berettas | Demolition", tier: "purple" }, { name: "Dual Berettas | Cobalt Quartz", tier: "purple" }, { name: "Dual Berettas | Duelist", tier: "purple" }, { name: "Dual Berettas | Hemoglobin", tier: "purple" },
+                { name: "Dual Berettas | Marina", tier: "pink" }, { name: "Dual Berettas | Urban Shock", tier: "pink" }, { name: "Dual Berettas | Royal Consorts", tier: "pink" }, { name: "Dual Berettas | Dezastre", tier: "pink" }, { name: "Dual Berettas | Flora Carnivora", tier: "pink" }, { name: "Dual Berettas | Cobra Strike", tier: "pink" },
+                { name: "Dual Berettas | Twin Turbo", tier: "red" }, { name: "Dual Berettas | Melondrama", tier: "red" }
+            ] },
+            { id: 'cz75', name: 'Skrzynia CZ75-Auto', price: 20.00, items: [
+                { name: "CZ75-Auto | Silver", tier: "blue" }, { name: "CZ75-Auto | Hexane", tier: "blue" }, { name: "CZ75-Auto | Twist", tier: "blue" }, { name: "CZ75-Auto | Poison Dart", tier: "blue" }, { name: "CZ75-Auto | Crimson Web", tier: "blue" }, { name: "CZ75-Auto | Emerald", tier: "blue" }, { name: "CZ75-Auto | Nitro", tier: "blue" }, { name: "CZ75-Auto | Tuxedo", tier: "blue" },
+                { name: "CZ75-Auto | Polymer", tier: "purple" }, { name: "CZ75-Auto | Imprint", tier: "purple" }, { name: "CZ75-Auto | Distressed", tier: "purple" }, { name: "CZ75-Auto | Emerald Quartz", tier: "purple" }, { name: "CZ75-Auto | Vendetta", tier: "purple" }, { name: "CZ75-Auto | Circaetus", tier: "purple" }, { name: "CZ75-Auto | Chalice", tier: "purple" }, { name: "CZ75-Auto | Tread Plate", tier: "purple" }, { name: "CZ75-Auto | Tigris", tier: "purple" }, { name: "CZ75-Auto | Pole Position", tier: "purple" },
+                { name: "CZ75-Auto | Red Astor", tier: "pink" }, { name: "CZ75-Auto | Tacticat", tier: "pink" }, { name: "CZ75-Auto | Eco", tier: "pink" }, { name: "CZ75-Auto | Syndicate", tier: "pink" }, { name: "CZ75-Auto | The Fuschia Is Now", tier: "pink" },
+                { name: "CZ75-Auto | Yellow Jacket", tier: "red" }, { name: "CZ75-Auto | Xiangliu", tier: "red" }, { name: "CZ75-Auto | Victoria", tier: "red" }
+            ] },
+            { id: 'glock', name: 'Skrzynia Glock-18', price: 20.00, items: [
+                { name: "Glock-18 | Candy Apple", tier: "blue" }, { name: "Glock-18 | Blue Fissure", tier: "blue" }, { name: "Glock-18 | Catacombs", tier: "blue" }, { name: "Glock-18 | Bunsen Burner", tier: "blue" }, { name: "Glock-18 | Wraiths", tier: "blue" }, { name: "Glock-18 | Ironwork", tier: "blue" }, { name: "Glock-18 | Off World", tier: "blue" }, { name: "Glock-18 | Warhawk", tier: "blue" }, { name: "Glock-18 | Oxide Blaze", tier: "blue" }, { name: "Glock-18 | Sacrifice", tier: "blue" }, { name: "Glock-18 | Clear Polymer", tier: "blue" }, { name: "Glock-18 | Winterized", tier: "blue" }, { name: "Glock-18 | Glockingbird", tier: "blue" },
+                { name: "Glock-18 | Reactor", tier: "purple" }, { name: "Glock-18 | Teal Graf", tier: "purple" }, { name: "Glock-18 | Green Line", tier: "purple" }, { name: "Glock-18 | Coral Bloom", tier: "purple" }, { name: "Glock-18 | Brass", tier: "purple" }, { name: "Glock-18 | Nuclear Garden", tier: "purple" }, { name: "Glock-18 | Synth Leaf", tier: "purple" }, { name: "Glock-18 | Steel Disruption", tier: "purple" }, { name: "Glock-18 | Grinder", tier: "purple" }, { name: "Glock-18 | Royal Legion", tier: "purple" }, { name: "Glock-18 | Weasel", tier: "purple" }, { name: "Glock-18 | Moonrise", tier: "purple" }, { name: "Glock-18 | Umbral Rabbit", tier: "purple" }, { name: "Glock-18 | Block 18", tier: "purple" }, { name: "Glock-18 | Trace Lock", tier: "purple" },
+                { name: "Glock-18 | Fade", tier: "pink" }, { name: "Glock-18 | Franklin", tier: "pink" }, { name: "Glock-18 | Pink DDPAT", tier: "pink" }, { name: "Glock-18 | Dragon Tattoo", tier: "pink" }, { name: "Glock-18 | Twilight Galaxy", tier: "pink" }, { name: "Glock-18 | AXIA", tier: "pink" }, { name: "Glock-18 | Water Elemental", tier: "pink" }, { name: "Glock-18 | Vogue", tier: "pink" }, { name: "Glock-18 | Snack Attack", tier: "pink" }, { name: "Glock-18 | Shinobu", tier: "pink" }, { name: "Glock-18 | Mirror Mosaic", tier: "pink" },
+                { name: "Glock-18 | Ramese's Reach", tier: "red" }, { name: "Glock-18 | Gamma Doppler", tier: "red" }, { name: "Glock-18 | Wasteland Rebel", tier: "red" }, { name: "Glock-18 | Bullet Queen", tier: "red" }, { name: "Glock-18 | Neo-Noir", tier: "red" }, { name: "Glock-18 | Gold Toof", tier: "red" }, { name: "Glock-18 | Fully Tuned", tier: "red" }
+            ] },
+            { id: 'usps', name: 'Skrzynia USP-S', price: 25.00, items: [
+                { name: "USP-S | Torque", tier: "blue" }, { name: "USP-S | Check Engine", tier: "blue" }, { name: "USP-S | Ticket to Hell", tier: "blue" }, { name: "USP-S | Night Ops", tier: "blue" }, { name: "USP-S | Flashback", tier: "blue" }, { name: "USP-S | Blood Tiger", tier: "blue" }, { name: "USP-S | Lead Conduit", tier: "blue" }, { name: "USP-S | Business Class", tier: "blue" }, { name: "USP-S | Royal Guard", tier: "blue" }, { name: "USP-S | Bleeding Edge", tier: "blue" },
+                { name: "USP-S | Alpine Camo", tier: "purple" }, { name: "USP-S | Guardian", tier: "purple" }, { name: "USP-S | Cyrex", tier: "purple" }, { name: "USP-S | Black Lotus", tier: "purple" }, { name: "USP-S | Stainless", tier: "purple" }, { name: "USP-S | Overgrowth", tier: "purple" }, { name: "USP-S | Royal Blue", tier: "purple" }, { name: "USP-S | Blueprint", tier: "purple" }, { name: "USP-S | Dark Water", tier: "purple" },
+                { name: "USP-S | Cortex", tier: "pink" }, { name: "USP-S | Monster Mashup", tier: "pink" }, { name: "USP-S | Caiman", tier: "pink" }, { name: "USP-S | Ancient Visions", tier: "pink" }, { name: "USP-S | Serum", tier: "pink" }, { name: "USP-S | Purple DDPAT", tier: "pink" }, { name: "USP-S | Orion", tier: "pink" }, { name: "USP-S | Orange Anolis", tier: "pink" }, { name: "USP-S | Road Rash", tier: "pink" }, { name: "USP-S | Whiteout", tier: "pink" },
+                { name: "USP-S | Neo-Noir", tier: "red" }, { name: "USP-S | Printstream", tier: "red" }, { name: "USP-S | The Traitor", tier: "red" }, { name: "USP-S | Kill Confirmed", tier: "red" }, { name: "USP-S | Target Acquired", tier: "red" }
+            ] },
+            { id: 'fakee', name: 'Skrzynia FAKEE', price: 40.00, items: [
+                { name: "AK-47 | Safari Mesh", tier: "blue" }, { name: "M4A1-S | Boreal Forest", tier: "blue" }, { name: "M4A4 | Desert Storm", tier: "blue" }, { name: "AWP | Pit Viper", tier: "blue" }, { name: "Desert Eagle | Bronze Deco", tier: "blue" }, { name: "AUG | Sweeper", tier: "blue" }, { name: "Galil AR | Black Sand", tier: "blue" },
+                { name: "AK-47 | Slate", tier: "purple" }, { name: "M4A1-S | Night Terror", tier: "purple" }, { name: "AWP | Phobos", tier: "purple" }, { name: "Desert Eagle | Conspiracy", tier: "purple" }, { name: "Five-SeveN | Retribution", tier: "purple" },
+                { name: "AK-47 | Redline", tier: "pink" }, { name: "M4A1-S | Decimator", tier: "pink" }, { name: "AWP | Fever Dream", tier: "pink" },
+                { name: "AK-47 | Vulcan", tier: "red" }, { name: "M4A4 | Asiimov", tier: "red" },
+                { name: "★ Karambit | Doppler", tier: "gold" }
+            ] },
+            { id: 'toxic', name: 'Skrzynia TOXIC', price: 45.00, items: [
+                { name: "AK-47 | Uncharted", tier: "blue" }, { name: "M4A1-S | Mud-Spec", tier: "blue" }, { name: "M4A4 | Magnesium", tier: "blue" }, { name: "AWP | Acheron", tier: "blue" }, { name: "Desert Eagle | Night", tier: "blue" }, { name: "FAMAS | Survivor Z", tier: "blue" }, { name: "CZ75-Auto | Poison Dart", tier: "blue" },
+                { name: "AK-47 | Safety Net", tier: "purple" }, { name: "M4A4 | Radiation Hazard", tier: "purple" }, { name: "AWP | Atheris", tier: "purple" }, { name: "AUG | Random Access", tier: "purple" }, { name: "Galil AR | Cerberus", tier: "purple" },
+                { name: "M4A4 | Desolate Space", tier: "pink" }, { name: "AWP | Mortis", tier: "pink" }, { name: "Desert Eagle | Ocean Drive", tier: "pink" },
+                { name: "M4A1-S | Hyper Beast", tier: "red" }, { name: "AWP | Wildfire", tier: "red" },
+                { name: "★ Skeleton Knife | Fade", tier: "gold" }
+            ] },
+            { id: 'venom', name: 'Skrzynia VENOM', price: 50.00, items: [
+                { name: "AK-47 | Elite Build", tier: "blue" }, { name: "M4A1-S | Fizzy POP", tier: "blue" }, { name: "M4A4 | Converter", tier: "blue" }, { name: "AWP | Black Nile", tier: "blue" }, { name: "Desert Eagle | Meteorite", tier: "blue" }, { name: "Five-SeveN | Coolant", tier: "blue" }, { name: "Dual Berettas | Shred", tier: "blue" },
+                { name: "AK-47 | Rat Rod", tier: "purple" }, { name: "M4A1-S | Basilisk", tier: "purple" }, { name: "M4A4 | Evil Daimyo", tier: "purple" }, { name: "AWP | Exoskeleton", tier: "purple" }, { name: "CZ75-Auto | Vendetta", tier: "purple" },
+                { name: "AK-47 | Phantom Disruptor", tier: "pink" }, { name: "M4A1-S | Nightmare", tier: "pink" }, { name: "FAMAS | Afterimage", tier: "pink" },
+                { name: "Desert Eagle | Printstream", tier: "red" }, { name: "AK-47 | Bloodsport", tier: "red" },
+                { name: "★ M9 Bayonet | Marble Fade", tier: "gold" }] }
+        ];
+        const localImages = { "AK-47 | Predator": "AK-47_Predator.webp", "AK-47 | Jungle Spray": "AK-47_Kolory_dżungli.webp", "AK-47 | Safari Mesh": "AK-47_Siatka_safari.webp", "AK-47 | Baroque Purple": "AK-47_Barokowa_purpura.webp", "AK-47 | Black Laminate": "AK-47_Czarny_laminat.webp", "AK-47 | Elite Build": "AK-47_Elitarny.webp", "AK-47 | Uncharted": "AK-47_Niezbadany.webp", "AK-47 | Emerald Pinstripe": "AK-47_Szmaragdowe_Pręgi.webp", "AK-47 | Steel Delta": "AK-47_Stalowa_Delta.webp", "AK-47 | First Class": "AK-47_Pierwsza_Klasa.webp", "AK-47 | Blue Laminate": "AK-47_Niebieski_Laminat.webp", "AK-47 | Orbit Mk01": "AK-47_Orbit_Wz_01.webp", "AK-47 | Safety Net": "AK-47_Siatka_Bezpieczeństwa.webp", "AK-47 | Rat Rod": "AK-47_Rat_rod.webp", "AK-47 | Slate": "AK-47_Czerń.webp", "AK-47 | Jet Set": "AK-47_Turysta.webp", "AK-47 | Hydroponic": "AK-47_Hydroponika.webp", "AK-47 | Case Hardened": "AK-47_Stal_Nawęglana.webp", "AK-47 | Red Laminate": "AK-47_Czerwony_Laminat.webp", "AK-47 | Redline": "AK-47_Czerwona_Linia.webp", "AK-47 | Cartel": "AK-47_Kartel.webp", "AK-47 | Frontside Misty": "AK-47_Mglisty.webp", "AK-47 | Point Disarray": "AK-47_Sedno_Zamieszania.webp", "AK-47 | Phantom Disruptor": "AK-47_Phantom_Disruptor.webp", "AK-47 | Panthera onca": "AK-47_Jaguarr.webp", "AK-47 | Ice Coaled": "AK-47_Ice_Coaled.webp", "AK-47 | Fire Serpent": "AK-47_Fire_Serpent.webp", "AK-47 | Vulcan": "AK-47_Vulcan.webp", "AK-47 | Jaguar": "AK-47_Jaguar.webp", "AK-47 | Wasteland Rebel": "AK-47_Wasteland_Rebel.webp", "AK-47 | Aquamarine Revenge": "AK-47_Aquamarine_Revenge.webp", "AK-47 | Fuel Injector": "AK-47_Fuel_Injector.webp", "AK-47 | Neon Revolution": "AK-47_Neon_Revolution.webp", "AK-47 | Bloodsport": "AK-47_Bloodsport.webp", "AK-47 | The Empress": "AK-47_The_Empress.webp", "AK-47 | Neon Rider": "AK-47_Neon_Rider.webp", "AK-47 | Asiimov": "AK-47_Asiimov.webp", "AK-47 | Wild Lotus": "AK-47_Dziki_lotos.webp", "AK-47 | Legion of Anubis": "AK-47_Legion_Anubisa.webp", "AK-47 | X-Ray": "AK-47_Rentgen.webp", "AK-47 | Gold Arabesque": "AK-47_Złota.webp", "AK-47 | Leet Museo": "AK-47_Leet_museo.webp", "AK-47 | Nightwish": "AK-47_Nightwish.webp", "AK-47 | Head Shot": "AK-47_Strzał.webp", "AK-47 | Inheritance": "AK-47_Inheritance.webp",
+            "M4A1-S | Fizzy POP": "M4A1-S_Napój_gazowany.webp", "M4A1-S | Briefing": "M4A1-S_Briefing.webp", "M4A1-S | VariCamo": "M4A1-S_VariCamo.webp", "M4A1-S | Mud-Spec": "M4A1-S_błotnisty.webp", "M4A1-S | Moss Quartz": "M4A1-S_Mchowy_kwarc.webp", "M4A1-S | Boreal Forest": "M4A1-S_Boreal_Forest.webp", "M4A1-S | Guardian": "M4A1-S_Guardian.webp", "M4A1-S | Emphorosaur-S": "M4A1-S_Emphorosaur-S.webp", "M4A1-S | Night Terror": "M4A1-S_Nocny_terror.webp", "M4A1-S | Flashback": "M4A1-S_Flashback.webp", "M4A1-S | Basilisk": "M4A1-S_Basilisk.webp", "M4A1-S | Bright Water": "M4A1-S_Bright_Water.webp", "M4A1-S | Dark Water": "M4A1-S_Dark_Water.webp", "M4A1-S | Nitro": "M4A1-S_Nitro.webp", "M4A1-S | Blood Tiger": "M4A1-S_Blood_Tiger.webp", "M4A1-S | Black Lotus": "M4A1-S_Czarny_lotos.webp", "M4A1-S | Blue Phosphor": "M4A1-S_Niebieski_fosfor.webp", "M4A1-S | Control Panel": "M4A1-S_Control_Panel.webp", "M4A1-S | Nightmare": "M4A1-S_Nightmare.webp", "M4A1-S | Leaded Glass": "M4A1-S_Leaded_Glass.webp", "M4A1-S | Decimator": "M4A1-S_Decimator.webp", "M4A1-S | Atomic Alloy": "M4A1-S_Atomic_Alloy.webp", "M4A1-S | Hot Rod": "M4A1-S_Hot_Rod.webp", "M4A1-S | Knight": "M4A1-S_Knight.webp", "M4A1-S | Icarus Fell": "M4A1-S_Icarus_Fell.webp", "M4A1-S | Imminent Danger": "M4A1-S_Bliskie_Niebezpieczeństwo.webp", "M4A1-S | Welcome to the Jungle": "M4A1-S_Witamy_w_dżungli.webp", "M4A1-S | Printstream": "M4A1-S_Łańcuch_znaków.webp", "M4A1-S | Player Two": "M4A1-S_Player_Two.webp", "M4A1-S | Mecha Industries": "M4A1-S_Mecha_Industries.webp", "M4A1-S | Chantico's Fire": "M4A1-S_Chantico.webp", "M4A1-S | Golden Coil": "M4A1-S_Golden_Coil.webp", "M4A1-S | Hyper Beast": "M4A1-S_Hyper_Beast.webp", "M4A1-S | Cyrex": "M4A1-S_Cyrex.webp", "M4A1-S | Master Piece": "M4A1-S_Master_Piece.webp",
+            "M4A4 | Desert Storm": "M4A4_Desert_Storm.webp", "M4A4 | Jungle Tiger": "M4A4_Jungle_Tiger.webp", "M4A4 | Tornado": "M4A4_Tornado.webp", "M4A4 | Urban DDPAT": "M4A4_Urban_DDPAT.webp", "M4A4 | Mainframe": "M4A4_Mainframe.webp", "M4A4 | Dark Blossom": "M4A4_Ciemny_rozkwit.webp", "M4A4 | Radiation Hazard": "M4A4_Radiation_Hazard.webp", "M4A4 | Faded Zebra": "M4A4_Faded_Zebra.webp", "M4A4 | Converter": "M4A4_Converter.webp", "M4A4 | Magnesium": "M4A4_Magnesium.webp", "M4A4 | Global Offensive": "M4A4_Global_Offensive.webp", "M4A4 | Poly Mag": "M4A4_Poly_Mag.webp", "M4A4 | Modern Hunter": "M4A4_Modern_Hunter.webp", "M4A4 | Daybreak": "M4A4_Daybreak.webp", "M4A4 | Zirka": "M4A4_Zirka.webp", "M4A4 | Evil Daimyo": "M4A4_Evil_Daimyo.webp", "M4A4 | Griffin": "M4A4_Griffin.webp", "M4A4 | Red DDPAT": "M4A4_Czerwony_DDPAT.webp", "M4A4 | Spider Lily": "M4A4_Lycoris.webp", "M4A4 | Etch Lord": "M4A4_Etch_Lord.webp", "M4A4 | Poseidon": "M4A4_Poseidon.webp", "M4A4 | Desolate Space": "M4A4_Desolate_Space.webp", "M4A4 | 龍王 (Dragon King)": "M4A4_Smoczy_wladca.webp", "M4A4 | Hellfire": "M4A4_Hellfire.webp", "M4A4 | Tooth Fairy": "M4A4_Wróżka_Zębuszka.webp", "M4A4 | Cyber Security": "M4A4_Cyberbezpieczeństwo.webp", "M4A4 | X-Ray": "M4A4_X-Ray.webp", "M4A4 | Asiimov": "M4A4_Asiimov.webp", "M4A4 | Desert-Strike": "M4A4_Desert-Strike.webp", "M4A4 | Royal Paladin": "M4A4_Royal_Paladin.webp", "M4A4 | The Battlestar": "M4A4_The_Battlestar.webp", "M4A4 | Buzz Kill": "M4A4_Buzz_Kill.webp", "M4A4 | Neo-Noir": "M4A4_Neo-Noir.webp", "M4A4 | The Emperor": "M4A4_Emperor.webp", "M4A4 | In Living Color": "M4A4_W_żywe_kolory.webp", "M4A4 | The Coalition": "M4A4_Koalicja.webp", "M4A4 | Temukau": "M4A4_Temukau.webp", "M4A4 | Eye of Horus": "M4A4_Oko_Horusa.webp", "M4A4 | Howl": "M4A4_Howl.webp",
+            "AWP | Safari Mesh": "AWP_Safari_Mesh.webp", "AWP | Sun in Leo": "AWP_Sun_in_Leo.webp", "AWP | Snake Camo": "AWP_Snake_Camo.webp", "AWP | Acheron": "AWP_Acheron.webp", "AWP | Capillary": "AWP_Capillary.webp", "AWP | Black Nile": "AWP_Czarny_Nil.webp", "AWP | Pit Viper": "AWP_Pit_Viper.webp", "AWP | Pink DDPAT": "AWP_Pink_DDPAT.webp", "AWP | Worm God": "AWP_Worm_God.webp", "AWP | Phobos": "AWP_Phobos.webp", "AWP | PAW": "AWP_PAW.webp", "AWP | Atheris": "AWP_Atheris.webp", "AWP | Exoskeleton": "AWP_Egzoszkielet.webp", "AWP | POP AWP": "AWP_Wyskakująca_spluwa.webp", "AWP | BOOM": "AWP_BOOM.webp", "AWP | Graphite": "AWP_Graphite.webp", "AWP | Electric Hive": "AWP_Electric_Hive.webp", "AWP | Redline": "AWP_Redline.webp", "AWP | Corticera": "AWP_Corticera.webp", "AWP | Elite Build": "AWP_Elite_Build.webp", "AWP | Fever Dream": "AWP_Fever_Dream.webp", "AWP | Mortis": "AWP_Mortis.webp", "AWP | Duality": "AWP_Duality.webp", "AWP | Chromatic Aberration": "AWP_Aberracja_chromatyczna.webp", "AWP | Lightning Strike": "AWP_Lightning_Strike.webp", "AWP | Asiimov": "AWP_Asiimov.webp", "AWP | Man-o'-war": "AWP_Okręt_Wojenny.webp", "AWP | Hyper Beast": "AWP_Hyper_Beast.webp", "AWP | Oni Taiji": "AWP_Oni_Taiji.webp", "AWP | Neo-Noir": "AWP_Neo-Noir.webp", "AWP | Wildfire": "AWP_Wildfire.webp", "AWP | Chrome Cannon": "AWP_Chrome_Cannon.webp", "AWP | Fade": "AWP_Gradient.webp", "AWP | Desert Hydra": "AWP_Pustynna_hydra.webp", "AWP | The Prince": "AWP_Książę.webp", "AWP | Gungnir": "AWP_Gungnir.webp", "AWP | Medusa": "AWP_Medusa.webp", "AWP | Dragon Lore": "AWP_Dragon_Lore.webp",
+            "★ Karambit | Urban Masked": "Karambit_Urban_Masked.webp", "★ Karambit | Stained": "Karambit_Stained.webp", "★ Karambit | Slaughter": "Karambit_Slaughter.webp", "★ Karambit | Scorched": "Karambit_Scorched.webp", "★ Karambit | Safari Mesh": "Karambit_Safari_Mesh.webp", "★ Karambit | Night": "Karambit_Night.webp", "★ Karambit | Forest DDPAT": "Karambit_Forest_DDPAT.webp", "★ Karambit | Fade": "Karambit_Fade.webp", "★ Karambit | Crimson Web": "Karambit_Crimson_Web.webp", "★ Karambit | Case Hardened": "Karambit_Case_Hardened.webp", "★ Karambit | Boreal Forest": "Karambit_Boreal_Forest.webp", "★ Karambit | Blue Steel": "Karambit_Blue_Steel.webp", "★ Karambit | Ultraviolet": "Karambit_Ultraviolet.webp", "★ Karambit | Rust Coat": "Karambit_Rust_Coat.webp", "★ Karambit | Tiger Tooth": "Karambit_Tiger_Tooth.webp", "★ Karambit | Marble Fade": "Karambit_Marble_Fade.webp", "★ Karambit | Doppler": "Karambit_Doppler.webp", "★ Karambit | Damascus Steel": "Karambit_Damascus_Steel.webp", "★ Karambit | Freehand": "Karambit_Freehand.webp", "★ Karambit | Bright Water": "Karambit_Bright_Water.webp", "★ Karambit | Autotronic": "Karambit_Autotronic.webp", "★ Karambit | Gamma Doppler": "Karambit_Gamma_Doppler.webp", "★ Karambit | Black Laminate": "Karambit_Black_Laminate.webp", "★ Karambit | Lore": "Karambit_Lore.webp",
+            "★ Flip Knife | Urban Masked": "N%3F%3F_sk%3Fadany_Urban_Masked.webp", "★ Flip Knife | Stained": "N%3F%3F_sk%3Fadany_Stained.webp", "★ Flip Knife | Slaughter": "N%3F%3F_sk%3Fadany_Slaughter.webp", "★ Flip Knife | Scorched": "N%3F%3F_sk%3Fadany_Scorched.webp", "★ Flip Knife | Safari Mesh": "N%3F%3F_sk%3Fadany_Safari_Mesh.webp", "★ Flip Knife | Night": "N%3F%3F_sk%3Fadany_Night.webp", "★ Flip Knife | Forest DDPAT": "N%3F%3F_sk%3Fadany_Forest_DDPAT.webp", "★ Flip Knife | Fade": "N%3F%3F_sk%3Fadany_Fade.webp", "★ Flip Knife | Crimson Web": "N%3F%3F_sk%3Fadany_Crimson_Web.webp", "★ Flip Knife | Case Hardened": "N%3F%3F_sk%3Fadany_Case_Hardened.webp", "★ Flip Knife | Boreal Forest": "N%3F%3F_sk%3Fadany_Boreal_Forest.webp", "★ Flip Knife | Blue Steel": "N%3F%3F_sk%3Fadany_Blue_Steel.webp", "★ Flip Knife | Rust Coat": "N%3F%3F_sk%3Fadany_Rust_Coat.webp", "★ Flip Knife | Tiger Tooth": "N%3F%3F_sk%3Fadany_Tiger_Tooth.webp", "★ Flip Knife | Marble Fade": "N%3F%3F_sk%3Fadany_Marble_Fade.webp", "★ Flip Knife | Doppler": "N%3F%3F_sk%3Fadany_Doppler.webp", "★ Flip Knife | Damascus Steel": "N%3F%3F_sk%3Fadany_Damascus_Steel.webp", "★ Flip Knife | Freehand": "N%3F%3F_sk%3Fadany_Freehand.webp", "★ Flip Knife | Bright Water": "N%3F%3F_sk%3Fadany_Bright_Water.webp", "★ Flip Knife | Autotronic": "N%3F%3F_sk%3Fadany_Autotronic.webp", "★ Flip Knife | Gamma Doppler": "N%3F%3F_sk%3Fadany_Gamma_Doppler.webp", "★ Flip Knife | Black Laminate": "N%3F%3F_sk%3Fadany_Black_Laminate.webp", "★ Flip Knife | Lore": "N%3F%3F_sk%3Fadany_Lore.webp", "★ Flip Knife | Ultraviolet": "N_fiolet.webp",
+            "★ Bowie Knife | Urban Masked": "N%3F%3F_Bowie_Urban_Masked.webp", "★ Bowie Knife | Slaughter": "N%3F%3F_Bowie_Slaughter.webp", "★ Bowie Knife | Scorched": "N%3F%3F_Bowie_Scorched.webp", "★ Bowie Knife | Safari Mesh": "N%3F%3F_Bowie_Safari_Mesh.webp", "★ Bowie Knife | Night": "N%3F%3F_Bowie_Night.webp", "★ Bowie Knife | Forest DDPAT": "N%3F%3F_Bowie_Forest_DDPAT.webp", "★ Bowie Knife | Crimson Web": "N%3F%3F_Bowie_Crimson_Web.webp", "★ Bowie Knife | Case Hardened": "N%3F%3F_Bowie_Case_Hardened.webp", "★ Bowie Knife | Boreal Forest": "N%3F%3F_Bowie_Boreal_Forest.webp", "★ Bowie Knife | Blue Steel": "N%3F%3F_Bowie_Blue_Steel.webp", "★ Bowie Knife | Ultraviolet": "N%3F%3F_Bowie_Ultraviolet.webp", "★ Bowie Knife | Tiger Tooth": "N%3F%3F_Bowie_Tygrysi_kie%3F.webp", "★ Bowie Knife | Rust Coat": "N%3F%3F_Bowie_Warstwa_rdzy.webp", "★ Bowie Knife | Doppler": "N%3F%3F_Bowie_Doppler.webp", "★ Bowie Knife | Damascus Steel": "N%3F%3F_Bowie_Stal_damasce%3Fska.webp", "★ Bowie Knife | Freehand": "N%3F%3F_Bowie_R%3Fkodzie%3Fo.webp", "★ Bowie Knife | Black Laminate": "N%3F%3F_Bowie_Czarny_laminat.webp", "★ Bowie Knife | Autotronic": "N%3F%3F_Bowie_Autotronika.webp", "★ Bowie Knife | Bright Water": "N%3F%3F_Bowie_Jasne_wody.webp", "★ Bowie Knife | Gamma Doppler": "N%3F%3F_Bowie_Gamma_Doppler.webp", "★ Bowie Knife | Lore": "N%3F%3F_Bowie_Wiedza.webp", "★ Bowie Knife | Stained": "N%3F%3F_Bowie_Stained.webp", "★ Bowie Knife | Marble Fade": "N%3F%3F_Bowie_Marmurkowy_gradient.webp",
+            "★ Skeleton Knife | Safari Mesh": "Nóż_szkieletowy_Siatka_safari.webp", "★ Skeleton Knife | Urban Masked": "N%3F%3F_szkieletowy_Miejski_zamaskowany.webp", "★ Skeleton Knife | Night Stripe": "Nóż_szkieletowy_Nocne_pręgi.webp", "★ Skeleton Knife | Forest DDPAT": "N%3F%3F_szkieletowy_Le%3Fny_DDPAT.webp", "★ Skeleton Knife | Boreal Forest": "N%3F%3F_szkieletowy_Tajga.webp", "★ Skeleton Knife | Stained": "N%3F%3F_szkieletowy_%3Fnied%3F.webp", "★ Skeleton Knife | Blue Steel": "N%3F%3F_szkieletowy_Niebieska_stal.webp", "★ Skeleton Knife | Case Hardened": "N%3F%3F_szkieletowy_Stal_naw%3Fglana.webp", "★ Skeleton Knife | Scorched": "N%3F%3F_szkieletowy_Popi%3F%3F.webp", "★ Skeleton Knife | Crimson Web": "Nóż_szkieletowy_Szkarłatna_sieć.webp", "★ Skeleton Knife | Slaughter": "N%3F%3F_szkieletowy_Rze%3F.webp", "★ Skeleton Knife | Fade": "Nóż_szkieletowy_Gradient.webp",
+              "★ M9 Bayonet | Safari Mesh": "Bagnet_M9_Safari_Mesh.webp", "★ M9 Bayonet | Night": "Bagnet_M9_Night.webp", "★ M9 Bayonet | Forest DDPAT": "Bagnet_M9_Forest_DDPAT.webp", "★ M9 Bayonet | Fade": "Bagnet_M9_Fade.webp", "★ M9 Bayonet | Crimson Web": "Bagnet_M9_Crimson_Web.webp", "★ M9 Bayonet | Case Hardened": "Bagnet_M9_Case_Hardened.webp", "★ M9 Bayonet | Boreal Forest": "Bagnet_M9_Boreal_Forest.webp", "★ M9 Bayonet | Damascus Steel": "Bagnet_M9_Damascus_Steel.webp", "★ M9 Bayonet | Freehand": "Bagnet_M9_Freehand.webp", "★ M9 Bayonet | Bright Water": "Bagnet_M9_Bright_Water.webp", "★ M9 Bayonet | Autotronic": "Bagnet_M9_Autotronic.webp", "★ M9 Bayonet | Gamma Doppler": "Bagnet_M9_Gamma_Doppler.webp", "★ M9 Bayonet | Black Laminate": "Bagnet_M9_Black_Laminate.webp", "★ M9 Bayonet | Lore": "Bagnet_M9_Lore.webp", "★ M9 Bayonet | Urban Masked": "Bagnet_M9_Urban_Masked.webp", "★ M9 Bayonet | Stained": "Bagnet_M9_Stained.webp", "★ M9 Bayonet | Slaughter": "Bagnet_M9_Slaughter.webp", "★ M9 Bayonet | Scorched": "Bagnet_M9_Scorched.webp", "★ M9 Bayonet | Blue Steel": "Bagnet_M9_Blue_Steel.webp", "★ M9 Bayonet | Ultraviolet": "Bagnet_M9_Ultraviolet.webp", "★ M9 Bayonet | Rust Coat": "Bagnet_M9_Rust_Coat.webp", "★ M9 Bayonet | Tiger Tooth": "Bagnet_M9_Tiger_Tooth.webp", "★ M9 Bayonet | Marble Fade": "Bagnet_M9_Marble_Fade.webp", "★ M9 Bayonet | Doppler": "Bagnet_M9_Doppler.webp",
+            "Desert Eagle | Ocean Drive": "Desert_Eagle_Nadmorska_ulica.webp", "Desert Eagle | Printstream": "Desert_Eagle_Printstream.webp", "Desert Eagle | Code Red": "Desert_Eagle_Code_Red.webp", "Desert Eagle | Golden Koi": "Desert_Eagle_Golden_Koi.webp", "Desert Eagle | Fennec Fox": "Desert_Eagle_Fenek_pustynny.webp", "Desert Eagle | Mecha Industries": "Desert_Eagle_Mecha_Industries.webp", "Desert Eagle | Kumicho Dragon": "Desert_Eagle_Kumicho_Dragon.webp", "Desert Eagle | Conspiracy": "Desert_Eagle_Conspiracy.webp", "Desert Eagle | Directive": "Desert_Eagle_Directive.webp", "Desert Eagle | Naga": "Desert_Eagle_Naga.webp", "Desert Eagle | Crimson Web": "Desert_Eagle_Crimson_Web.webp", "Desert Eagle | Heirloom": "Desert_Eagle_Heirloom.webp", "Desert Eagle | Sunset Storm 壱": "Desert_Eagle_Sunset_Storm_%3F.webp", "Desert Eagle | Pilot": "Desert_Eagle_Pilot.webp", "Desert Eagle | Hand Cannon": "Desert_Eagle_Hand_Cannon.webp", "Desert Eagle | Blaze": "Desert_Eagle_Blaze.webp", "Desert Eagle | Bronze Deco": "Desert_Eagle_Bronze_Deco.webp", "Desert Eagle | Meteorite": "Desert_Eagle_Meteorite.webp", "Desert Eagle | Urban Rubble": "Desert_Eagle_Urban_Rubble.webp", "Desert Eagle | Brass": "Desert_Eagle_Br%3Fz.webp", "Desert Eagle | Night": "Desert_Eagle_Night.webp", "Desert Eagle | Midnight Storm": "Desert_Eagle_Midnight_Storm.webp", "Desert Eagle | Urban DDPAT": "Desert_Eagle_Urban_DDPAT.webp", "Desert Eagle | Mudder": "Desert_Eagle_Mudder.webp", "Desert Eagle | Cobalt Disruption": "Desert_Eagle_Cobalt_Disruption.webp", "Desert Eagle | Hypnotic": "Desert_Eagle_Hypnotic.webp", "Desert Eagle | Trigger Discipline": "Desert_Eagle_Wyzwalanie_dyscypliny.webp", "Desert Eagle | Emerald Jörmungandr": "Desert_Eagle_Szmaragdowy_Jormungand.webp", "Desert Eagle | Light Rail": "Desert_Eagle_Light_Rail.webp", "Desert Eagle | Sputnik": "Desert_Eagle_Sputnik.webp", "Desert Eagle | Night Heist": "Desert_Eagle_Nocny_napad.webp", "Desert Eagle | Blue Ply": "Desert_Eagle_Blue_Ply.webp", "Desert Eagle | Oxide Blaze": "Desert_Eagle_Oxide_Blaze.webp", "Desert Eagle | Corinthian": "Desert_Eagle_Corinthian.webp",
+            "AUG | Sand Storm": "AUG_Burza_piaskowa.webp", "AUG | Torque": "AUG_Torque.webp", "AUG | Plague": "AUG_Plaga.webp", "AUG | Amber Fade": "AUG_Sp%3Fowia%3Fy_bursztyn.webp", "AUG | Carved Jade": "AUG_Rze%3Fbiony_jadeit.webp", "AUG | Tom Cat": "AUG_Tom_Cat.webp", "AUG | Amber Slipstream": "AUG_Amber_Slipstream.webp", "AUG | Triqua": "AUG_Triqua.webp", "AUG | Ricochet": "AUG_Ricochet.webp", "AUG | Wings": "AUG_Wings.webp", "AUG | Anodized Navy": "AUG_Anodized_Navy.webp", "AUG | Copperhead": "AUG_Copperhead.webp", "AUG | Withered Wood": "AUG_Obumieraj%3Fce_drewno.webp", "AUG | Radiation Hazard": "AUG_Radiation_Hazard.webp", "AUG | Condemned": "AUG_Condemned.webp", "AUG | Snake Pit": "AUG_Gniazdo_w%3F%3Fa.webp", "AUG | Surveillance": "AUG_Monitoring.webp", "AUG | Navy Murano": "AUG_Granatowe_szk%3Fo_mura%3Fskie.webp", "AUG | Sweeper": "AUG_Sweeper.webp", "AUG | Daedalus": "AUG_Daedalus.webp", "AUG | Contractor": "AUG_Contractor.webp", "AUG | Storm": "AUG_Storm.webp", "AUG | Colony": "AUG_Colony.webp", "AUG | Bengal Tiger": "AUG_Bengal_Tiger.webp", "AUG | Arctic Wolf": "AUG_Wilk_polarny.webp", "AUG | Midnight Lily": "AUG_Lilia_p%3F%3Fnocy.webp", "AUG | Flame Jörmungandr": "AUG_Ognisty_Jormungand.webp", "AUG | Random Access": "AUG_Random_Access.webp", "AUG | Aristocrat": "AUG_Aristocrat.webp", "AUG | Hot Rod": "AUG_Hot_Rod.webp", "AUG | Death by Puppy": "AUG_Death_by_Puppy.webp", "AUG | Momentum": "AUG_Momentum.webp", "AUG | Stymphalian": "AUG_Stymfalijski.webp", "AUG | Syd Mead": "AUG_Syd_Mead.webp", "AUG | Fleet Flock": "AUG_Fleet_Flock.webp", "AUG | Chameleon": "AUG_Chameleon.webp", "AUG | Akihabara Accept": "AUG_Akihabara_Accept.webp",
+            "Galil AR | Tuxedo": "Galil_AR_Tuxedo.webp", "Galil AR | Aqua Terrace": "Galil_AR_Aqua_Terrace.webp", "Galil AR | Shattered": "Galil_AR_Shattered.webp", "Galil AR | Blue Titanium": "Galil_AR_Blue_Titanium.webp", "Galil AR | Sandstorm": "Galil_AR_Sandstorm.webp", "Galil AR | Kami": "Galil_AR_Kami.webp", "Galil AR | Rocket Pop": "Galil_AR_Rocket_Pop.webp", "Galil AR | Black Sand": "Galil_AR_Black_Sand.webp", "Galil AR | Akoben": "Galil_AR_Akoben.webp", "Galil AR | Vandal": "Galil_AR_Wandal.webp", "Galil AR | Dusk Ruins": "Galil_AR_Ruiny_o_zmroku.webp", "Galil AR | Amber Fade": "Galil_AR_Sp%3Fowia%3Fy_bursztyn.webp", "Galil AR | Destroyer": "Galil_AR_Niszczyciel.webp", "Galil AR | Cerberus": "Galil_AR_Cerberus.webp", "Galil AR | Orange DDPAT": "Galil_AR_Orange_DDPAT.webp", "Galil AR | Stone Cold": "Galil_AR_Stone_Cold.webp", "Galil AR | Firefight": "Galil_AR_Firefight.webp", "Galil AR | Crimson Tsunami": "Galil_AR_Crimson_Tsunami.webp", "Galil AR | Signal": "Galil_AR_Signal.webp", "Galil AR | Connexion": "Galil_AR_Zwi%3Fzek.webp", "Galil AR | Phoenix Blacklight": "Galil_AR_Ultrafiolet_Phoenix.webp", "Galil AR | CAUTION!": "Galil_AR_UWAGA%21.webp", "Galil AR | Eco": "Galil_AR_Eco.webp", "Galil AR | Sugar Rush": "Galil_AR_Sugar_Rush.webp", "Galil AR | Chromatic Aberration": "Galil_AR_Aberracja_chromatyczna.webp", "Galil AR | Chatterbox": "Galil_AR_Chatterbox.webp",
+            "Five-SeveN | Coolant": "Five-SeveN_Coolant.webp", "Five-SeveN | Candy Apple": "Five-SeveN_Candy_Apple.webp", "Five-SeveN | Orange Peel": "Five-SeveN_Orange_Peel.webp", "Five-SeveN | Hot Shot": "Five-SeveN_Hot_Shot.webp", "Five-SeveN | Withered Vine": "Five-SeveN_Zwi%3Fd%3Fa_winoro%3Fl.webp", "Five-SeveN | Nitro": "Five-SeveN_Nitro.webp", "Five-SeveN | Nightshade": "Five-SeveN_Nightshade.webp", "Five-SeveN | Kami": "Five-SeveN_Kami.webp", "Five-SeveN | Urban Hazard": "Five-SeveN_Urban_Hazard.webp", "Five-SeveN | Violent Daimyo": "Five-SeveN_Violent_Daimyo.webp", "Five-SeveN | Scumbria": "Five-SeveN_Scumbria.webp", "Five-SeveN | Capillary": "Five-SeveN_Capillary.webp", "Five-SeveN | Flame Test": "Five-SeveN_Test_ognia.webp", "Five-SeveN | Crimson Blossom": "Five-SeveN_Szkar%3Fatny_rozkwit.webp", "Five-SeveN | Scrawl": "Five-SeveN_Bazgranina.webp", "Five-SeveN | Neon Kimono": "Five-SeveN_Neon_Kimono.webp", "Five-SeveN | Case Hardened": "Five-SeveN_Case_Hardened.webp", "Five-SeveN | Copper Galaxy": "Five-SeveN_Copper_Galaxy.webp", "Five-SeveN | Retribution": "Five-SeveN_Retrobution.webp", "Five-SeveN | Triumvirate": "Five-SeveN_Triumvirate.webp", "Five-SeveN | Buddy": "Five-SeveN_Buddy.webp", "Five-SeveN | Rooster": "Five-SeveN_Kogut.webp", "Five-SeveN | Boost Protocol": "Five-SeveN_Protok%3F%3F_wzmocnienia.webp", "Five-SeveN | Hybrid": "Five-SeveN_Hybrid.webp", "Five-SeveN | Fowl Play": "Five-SeveN_Fowl_Play.webp", "Five-SeveN | Monkey Business": "Five-SeveN_Monkey_Business.webp", "Five-SeveN | Fairy Tale": "Five-SeveN_Ba%3F%3F.webp", "Five-SeveN | Fall Hazard": "Five-SeveN_Zagro%3Fenie_upadkiem.webp", "Five-SeveN | Hyper Beast": "Five-SeveN_Hyper_Beast.webp", "Five-SeveN | Angry Mob": "Five-SeveN_Angry_Mob.webp",
+            "FAMAS | Contrast Spray": "FAMAS_Contrast_Spray.webp", "FAMAS | Colony": "FAMAS_Colony.webp", "FAMAS | Night Borre": "FAMAS_Nocny_kurhan.webp", "FAMAS | Faulty Wiring": "FAMAS_Wadliwe_okablowanie.webp", "FAMAS | Cyanospatter": "FAMAS_Cyanospatter.webp", "FAMAS | CaliCamo": "FAMAS_CaliCamo.webp", "FAMAS | Teardown": "FAMAS_Teardown.webp", "FAMAS | Doomkitty": "FAMAS_Doomkitty.webp", "FAMAS | Hexane": "FAMAS_Hexane.webp", "FAMAS | Survivor Z": "FAMAS_Survivor_Z.webp", "FAMAS | Macabre": "FAMAS_Macabre.webp", "FAMAS | Crypsis": "FAMAS_Crypsis.webp", "FAMAS | Decommissioned": "FAMAS_Decommissioned.webp", "FAMAS | Sundown": "FAMAS_Zach%3Fd_S%3Fo%3Fca.webp", "FAMAS | Dark Water": "FAMAS_Mroczne_wody.webp", "FAMAS | Meow 36": "FAMAS_Meow_36.webp", "FAMAS | Spitfire": "FAMAS_Spitfire.webp", "FAMAS | Styx": "FAMAS_Styx.webp", "FAMAS | Pulse": "FAMAS_Pulse.webp", "FAMAS | Sergeant": "FAMAS_Sergeant.webp", "FAMAS | Neural Net": "FAMAS_Neural_Net.webp", "FAMAS | Valence": "FAMAS_Valence.webp", "FAMAS | Prime Conspiracy": "FAMAS_Pierwsza_konspiracja.webp", "FAMAS | ZX Spectron": "FAMAS_ZX_Spectron.webp", "FAMAS | Afterimage": "FAMAS_Afterimage.webp", "FAMAS | Djinn": "FAMAS_Djinn.webp", "FAMAS | Mecha Industries": "FAMAS_Mecha_Industries.webp", "FAMAS | Eye of Athena": "FAMAS_Eye_of_Athena.webp", "FAMAS | Meltdown": "FAMAS_Topnienie.webp", "FAMAS | Rapid Eye Movement": "FAMAS_Szybki_ruch_oczu.webp", "FAMAS | Waters of Nephthys": "FAMAS_Wody_Neftydy.webp", "FAMAS | Roll Cage": "FAMAS_Roll_Cage.webp", "FAMAS | Commemoration": "FAMAS_Commemoration.webp",
+            "Dual Berettas | Moon in Libra": "Dwie_Beretty_Moon_in_Libra.webp", "Dual Berettas | Anodized Navy": "Dwie_Beretty_Anodized_Navy.webp", "Dual Berettas | Black Limba": "Dwie_Beretty_Black_Limba.webp", "Dual Berettas | Panther": "Dwie_Beretty_Panther.webp", "Dual Berettas | Retribution": "Dwie_Beretty_Retribution.webp", "Dual Berettas | Dualing Dragons": "Dwie_Beretty_Dualing_Dragons.webp", "Dual Berettas | Cartel": "Dwie_Beretty_Cartel.webp", "Dual Berettas | Ventilators": "Dwie_Beretty_Ventilators.webp", "Dual Berettas | Shred": "Dwie_Beretty_Shred.webp", "Dual Berettas | Elite 1.6": "Dwie_Beretty_Elite_1.6.webp", "Dual Berettas | Emerald": "Dwie_Beretty_Szmaragd.webp", "Dual Berettas | Balance": "Dwie_Beretty_R%3Fwnowaga.webp", "Dual Berettas | Drift Wood": "Dwie_Beretty_Odci%3Fni%3Fcie.webp", "Dual Berettas | Hideout": "Dwie_Beretty_Hideout.webp", "Dual Berettas | Demolition": "Dwie_Beretty_Demolition.webp", "Dual Berettas | Cobalt Quartz": "Dwie_Beretty_Cobalt_Quartz.webp", "Dual Berettas | Duelist": "Dwie_Beretty_Duelist.webp", "Dual Berettas | Hemoglobin": "Dwie_Beretty_Hemoglobin.webp", "Dual Berettas | Marina": "Dwie_Beretty_Marina.webp", "Dual Berettas | Urban Shock": "Dwie_Beretty_Urban_Shock.webp", "Dual Berettas | Royal Consorts": "Dwie_Beretty_Royal_Consorts.webp", "Dual Berettas | Dezastre": "Dwie_Beretty_Dezastre.webp", "Dual Berettas | Flora Carnivora": "Dwie_Beretty_Flora_Carnivora.webp", "Dual Berettas | Cobra Strike": "Dwie_Beretty_Cobra_Strike.webp", "Dual Berettas | Twin Turbo": "Dwie_Beretty_Twin_Turbo.webp", "Dual Berettas | Melondrama": "Dwie_Beretty_Melondramat.webp",
+            "CZ75-Auto | Silver": "CZ75-Auto_Srebro.webp", "CZ75-Auto | Victoria": "CZ75-Auto_Victoria.webp", "CZ75-Auto | Xiangliu": "CZ75-Auto_Xiangliu.webp", "CZ75-Auto | Yellow Jacket": "CZ75-Auto_Yellow_Jacket.webp", "CZ75-Auto | The Fuschia Is Now": "CZ75-Auto_The_Fuschia_Is_Now.webp", "CZ75-Auto | Syndicate": "CZ75-Auto_Syndykat.webp", "CZ75-Auto | Eco": "CZ75-Auto_Eco.webp", "CZ75-Auto | Tacticat": "CZ75-Auto_Tacticat.webp", "CZ75-Auto | Red Astor": "CZ75-Auto_Red_Astor.webp", "CZ75-Auto | Pole Position": "CZ75-Auto_Pole_Position.webp", "CZ75-Auto | Tigris": "CZ75-Auto_Tigris.webp", "CZ75-Auto | Tread Plate": "CZ75-Auto_Tread_Plate.webp", "CZ75-Auto | Chalice": "CZ75-Auto_Chalice.webp", "CZ75-Auto | Circaetus": "CZ75-Auto_Circaetus.webp", "CZ75-Auto | Vendetta": "CZ75-Auto_Wendeta.webp", "CZ75-Auto | Distressed": "CZ75-Auto_Distressed.webp", "CZ75-Auto | Emerald Quartz": "CZ75-Auto_Szmaragdowy_kwarc.webp", "CZ75-Auto | Polymer": "CZ75-Auto_Polymer.webp", "CZ75-Auto | Imprint": "CZ75-Auto_Imprint.webp", "CZ75-Auto | Hexane": "CZ75-Auto_Hexane.webp", "CZ75-Auto | Twist": "CZ75-Auto_Twist.webp", "CZ75-Auto | Poison Dart": "CZ75-Auto_Poison_Dart.webp", "CZ75-Auto | Crimson Web": "CZ75-Auto_Crimson_Web.webp", "CZ75-Auto | Emerald": "CZ75-Auto_Emerald.webp", "CZ75-Auto | Nitro": "CZ75-Auto_Nitro.webp", "CZ75-Auto | Tuxedo": "CZ75-Auto_Tuxedo.webp",
+            "USP-S | Torque": "USP-S_Torque.png", "USP-S | Check Engine": "USP-S_Check_Engine.png", "USP-S | Ticket to Hell": "USP-S_Ticket_to_Hell.png", "USP-S | Alpine Camo": "USP-S_Alpine_Camo.png", "USP-S | Night Ops": "USP-S_Night_Ops.png", "USP-S | Flashback": "USP-S_Flashback.png", "USP-S | Guardian": "USP-S_Guardian.png", "USP-S | Royal Guard": "USP-Royal.webp", "USP-S | Bleeding Edge": "USP-S_Bleeding_Edge.webp", "USP-S | Cyrex": "USP-S_Cyrex.png", "USP-S | Lead Conduit": "USP-S_Lead_Conduit.png", "USP-S | Cortex": "USP-S_Cortex.png", "USP-S | Black Lotus": "USP-S_Black Lotus.png", "USP-S | Blood Tiger": "USP-S_Blood Tiger.png", "USP-S | Stainless": "USP-S_Stainless.png", "USP-S | Business Class": "USP-S_Business_Class.png", "USP-S | Overgrowth": "USP-S_Overgrowth.png", "USP-S | Royal Blue": "USP-S_Royal_Blue.png", "USP-S | Blueprint": "USP-S_Blueprint.png", "USP-S | Neo-Noir": "USP-S_Neo_Noir.png", "USP-S | Monster Mashup": "USP-S_Monster_Mashup.png", "USP-S | Printstream": "USP-S_Printstream.png", "USP-S | Caiman": "USP-S_Caiman.png", "USP-S | Ancient Visions": "USP-S_Ancient_Visions.png", "USP-S | Dark Water": "USP-S_Dark_Water.png", "USP-S | The Traitor": "USP-S_The_Traitor.png", "USP-S | Serum": "USP-S_Serum.png", "USP-S | Purple DDPAT": "USP-S_Purple_DDPAT.png", "USP-S | Orion": "USP-S_Orion.png", "USP-S | Kill Confirmed": "USP-S _Kill_Confirmed.png", "USP-S | Orange Anolis": "USP-S _Orange_Anolis.png", "USP-S | Road Rash": "USP-S _Road_Rash.png", "USP-S | Target Acquired": "USP-S_Target_Acquired.png", "USP-S | Whiteout": "USP-S _Whiteout.png",
+            "Glock-18 | Candy Apple": "Glock-18_Candy_Apple.png", "Glock-18 | Reactor": "Glock-18_Reactor.png", "Glock-18 | Teal Graf": "Glock-18_Teal_Graf.png", "Glock-18 | Green Line": "Glock-18_Green_Line.png", "Glock-18 | Blue Fissure": "Glock-18_Blue_Fissure.png", "Glock-18 | Catacombs": "Glock-18_Catacombs.png", "Glock-18 | Bunsen Burner": "Glock-18_Bunsen_Burner.png", "Glock-18 | Wraiths": "Glock-18_Wraiths.png", "Glock-18 | Ironwork": "Glock-18_Ironwork.png", "Glock-18 | Off World": "Glock-18_Off_World.png", "Glock-18 | Warhawk": "Glock-18_Warhawk.png", "Glock-18 | Oxide Blaze": "Glock-18_Oxide_Blaze.png", "Glock-18 | Sacrifice": "Glock-18_Sacrifice.png", "Glock-18 | Clear Polymer": "Glock-18_Clear_Polymer.png", "Glock-18 | Winterized": "Glock-18_Winterized.png", "Glock-18 | Coral Bloom": "Glock-18_Coral_Bloom.png", "Glock-18 | Fade": "Glock-18_Fade.png", "Glock-18 | Brass": "Glock-18_Brass.png", "Glock-18 | Nuclear Garden": "Glock-18_Nuclear_Garden.png", "Glock-18 | Synth Leaf": "Glock-18_Synth_Leaf.png", "Glock-18 | Franklin": "Glock-18_Franklin.png", "Glock-18 | Pink DDPAT": "Glock-18_Pink_DDPAT.png", "Glock-18 | Ramese's Reach": "Glock-18_Reach.png", "Glock-18 | Dragon Tattoo": "Glock-18_Dragon_Tattoo.png", "Glock-18 | Steel Disruption": "Glock-18_Steel_Disruption.png", "Glock-18 | Grinder": "Glock-18_Grinder.png", "Glock-18 | Royal Legion": "Glock-18_Royal_Legion.png", "Glock-18 | Weasel": "Glock-18_Weasel.png", "Glock-18 | Moonrise": "Glock-18_Moonrise.png", "Glock-18 | Umbral Rabbit": "Glock-18_Umbral_Rabbit.png", "Glock-18 | Block 18": "Glock-18_Block_18.png", "Glock-18 | Glockingbird": "Glock-18_Glockingbird.png", "Glock-18 | Trace Lock": "Glock-18_Trace_Lock.png", "Glock-18 | Twilight Galaxy": "Glock-18_Twilight_Galaxy.png", "Glock-18 | AXIA": "Glock-18_AXIA.png", "Glock-18 | Water Elemental": "Glock-18_Water_Elemental.png", "Glock-18 | Vogue": "Glock-18_Vogue.png", "Glock-18 | Snack Attack": "Glock-18_Snack_Attack.png", "Glock-18 | Shinobu": "Glock-18_Shinobu.png", "Glock-18 | Mirror Mosaic": "Glock-18_Mirror_Mosaic.png", "Glock-18 | Gamma Doppler": "Glock-18_Gamma_Doppler.png", "Glock-18 | Wasteland Rebel": "Glock-18_Wasteland_Rebel.png", "Glock-18 | Bullet Queen": "Glock-18_Bullet_Queen.png", "Glock-18 | Neo-Noir": "Glock-18_Neo_Noir.png", "Glock-18 | Gold Toof": "Glock-18_Gold_Toof.png", "Glock-18 | Fully Tuned": "Glock-18_Fully_Tuned.webp" };
+        
+        const shopItems = [
+            { name: "AK-47 | Safari Mesh", price: 1500, tier: "blue", wear: "Field-Tested", isStatTrak: false, savedPrice: "5.00" },
+            { name: "AK-47 | Vulcan", price: 60000, tier: "red", wear: "Factory New", isStatTrak: false, savedPrice: "200.00" }
+        ];
+        const tierChances = { "blue": 79.92, "purple": 15.98, "pink": 3.20, "red": 0.64, "gold": 0.26 };
+        const tierHierarchy = ["blue", "purple", "pink", "red", "gold"];
+        // =========================================================================
+
+        // AUDIO & WIZUALIZACJE
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(f, d, t='sine', v=0.1) {
+            try {
+                if(audioCtx.state==='suspended') audioCtx.resume();
+                let o=audioCtx.createOscillator(); let g=audioCtx.createGain();
+                o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+                g.gain.setValueAtTime(v, audioCtx.currentTime);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+d); o.stop(audioCtx.currentTime+d);
+            } catch(e) {}
+        }
+        function playTick() { playBeep(800, 0.05, 'square', 0.02); }
+        function playWin() { playBeep(400, 0.1); setTimeout(()=>playBeep(600, 0.2), 100); }
+        function playEpic() { playBeep(300, 0.1, 'sawtooth', 0.2); setTimeout(()=>playBeep(450, 0.1, 'sawtooth'), 100); setTimeout(()=>playBeep(600, 0.4, 'sawtooth'), 200); }
+        function playError() { playBeep(150, 0.3, 'square', 0.1); }
+        function shakeScreen() { document.body.classList.add('shake'); setTimeout(()=>document.body.classList.remove('shake'), 500); }
+        function shootConfetti() {
+            const cols = ['#ff007a', '#00e5ff', '#ffd700', '#9d00ff'];
+            for(let i=0; i<50; i++) {
+                let c = document.createElement('div'); c.className = 'confetti';
+                c.style.left = Math.random()*100+'vw'; c.style.backgroundColor = cols[Math.floor(Math.random()*cols.length)];
+                c.style.animationDuration = (Math.random()*2+2)+'s'; document.body.appendChild(c); setTimeout(()=>c.remove(), 4000);
+            }
+        }
+
+        // ZMIENNE GRY
+        let balance = 1000.00, points = 0, inventory = [];
+        let level = 1, xp = 0, reqXp = 500, dailyClaimTime = 0; 
+        let isRolling = false, isUpgrading = false, battleActive = false, bjActive = false;
+
+        function saveData() {
+            localStorage.setItem('m_bal', balance); localStorage.setItem('m_pts', points);
+            localStorage.setItem('m_inv', JSON.stringify(inventory)); localStorage.setItem('m_xp', xp);
+            localStorage.setItem('m_lvl', level); localStorage.setItem('m_daily', dailyClaimTime);
+        }
+        function loadData() {
+            if(localStorage.getItem('m_bal')) balance = parseFloat(localStorage.getItem('m_bal'));
+            if(localStorage.getItem('m_pts')) points = parseInt(localStorage.getItem('m_pts'));
+            if(localStorage.getItem('m_inv')) { try{ inventory=JSON.parse(localStorage.getItem('m_inv')); }catch(e){inventory=[];} }
+            if(localStorage.getItem('m_xp')) xp = parseFloat(localStorage.getItem('m_xp'));
+            if(localStorage.getItem('m_lvl')) level = parseInt(localStorage.getItem('m_lvl'));
+            if(localStorage.getItem('m_daily')) dailyClaimTime = parseInt(localStorage.getItem('m_daily'));
+            reqXp = level * 500; updateUI(); checkDaily(); renderCasesInGrid();
+        }
+
+        function updateUI() {
+            document.getElementById('walletBalance').innerText = balance.toFixed(2) + " PLN";
+            document.getElementById('pointsBalance').innerText = points + " ⚡";
+            document.getElementById('levelDisplay').innerText = "LVL " + level;
+            document.getElementById('xpFill').style.width = Math.min((xp/reqXp)*100, 100) + "%";
+            saveData();
+        }
+        function addXp(amount) {
+            xp += amount;
+            while(xp >= reqXp) { xp -= reqXp; level++; reqXp = level * 500; playEpic(); shootConfetti(); alert(`Awans na poziom ${level}!`); }
+            updateUI();
+        }
+        function updateBalance(amount) { balance += amount; if(amount < 0) addXp(Math.abs(amount) * 1); updateUI(); }
+        function depositMoney() { updateBalance(100); alert("Dodano 100 PLN!"); }
+
+        function checkDaily() {
+            let b = document.getElementById('btnDaily');
+            if(Date.now()-dailyClaimTime > 86400000) { b.classList.remove('disabled'); b.title="Odbierz!"; } else { b.classList.add('disabled'); b.title="Wróć jutro"; }
+        }
+        function claimDailyReward() {
+            if(Date.now()-dailyClaimTime > 86400000) {
+                dailyClaimTime = Date.now(); let rc=Math.floor(Math.random()*50)+10, rp=Math.floor(Math.random()*1000)+100;
+                updateBalance(rc); points+=rp; playEpic(); shootConfetti(); updateUI(); checkDaily(); alert(`Otrzymujesz:\n+ ${rc} PLN\n+ ${rp} ⚡`);
+            } else { playError(); alert("Już odebrałeś nagrodę w ciągu ostatnich 24h!"); }
+        }
+
+        // RDZEŃ GENEROWANIA
+        function rollItem(caseItems) {
+            if(!caseItems || caseItems.length===0) return {name:"BŁĄD",tier:"blue",wear:"Factory New",wearMultiplier:1,isStatTrak:false};
+            const valid = caseItems.filter(i=>i&&i.tier); if(valid.length===0) return {name:"BŁĄD",tier:"blue",wear:"Factory New",wearMultiplier:1,isStatTrak:false};
+            const tiers = [...new Set(valid.map(i=>i.tier))];
+            let tot=0; tiers.forEach(t=>tot+=(tierChances[t]||1)); let r=Math.random()*tot; let sel=tiers[0];
+            for(let t of tiers){ let c=tierChances[t]||1; if(r<c){sel=t;break;} r-=c; }
+            const pool = valid.filter(i=>i.tier===sel); if(pool.length===0) return {name:"BŁĄD",tier:"blue",wear:"Factory New",wearMultiplier:1,isStatTrak:false};
+            const bItem = pool[Math.floor(Math.random()*pool.length)];
+            const wears = [{name:"Factory New",m:2.5,c:10},{name:"Minimal Wear",m:1.5,c:20},{name:"Field-Tested",m:1.0,c:40},{name:"Well-Worn",m:0.8,c:20},{name:"Battle-Scarred",m:0.5,c:10}];
+            let wr=Math.random()*100, sw=wears[0]; for(let w of wears){ if(wr<w.c){sw=w;break;} wr-=w.c; }
+            return {...bItem, wear:sw.name, wearMultiplier:sw.m, isStatTrak:Math.random()<0.10};
+        }
+        function getPrice(tier, wm, st) {
+            let b = tier==='blue'?5 : tier==='purple'?25 : tier==='pink'?120 : tier==='red'?600 : 2500;
+            let v = b * wm * (1+(Math.random()*0.4-0.2)); if(st) v*=2.5; return v.toFixed(2);
+        }
+        function getImg(name) { return (localImages[name]||'brak.webp').split('%').join('%25').replace(/'/g,''); }
+        function genCardHTML(item, bHtml="") {
+            let sW = item.wear==="Factory New"?"FN":item.wear==="Minimal Wear"?"MW":item.wear==="Field-Tested"?"FT":item.wear==="Well-Worn"?"WW":"BS";
+            return `<div class="inv-item-wrapper ${item.tier}"><div class="inv-item-top"><div class="inv-item-wear">${sW}</div><div class="inv-item-price">${item.savedPrice||'0.00'} PLN</div></div><div class="inv-item-image"><img src="${getImg(item.name)}"></div><div class="inv-item-info">${item.isStatTrak?`<div class="inv-item-st">ST™</div>`:''}<div class="inv-item-name">${item.name}</div></div>${bHtml}</div>`;
+        }
+
+        // NAWIGACJA ZAKŁADEK (Niezawodne ukrywanie stylami inline)
+        function switchTab(t) {
+            if(isRolling||battleActive||isUpgrading||bjActive) return;
+            document.querySelectorAll('.nav-links a').forEach(e=>e.classList.remove('active')); 
+            document.getElementById('nav'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.add('active');
+            
+            // Siłowe ukrywanie wszystkich sekcji zapobiega nakładaniu się okien
+            document.querySelectorAll('.game-area').forEach(e => {
+                e.classList.remove('active');
+                e.style.display = 'none'; 
+            }); 
+            
+            let target = document.getElementById(t+'Area');
+            target.classList.add('active');
+            target.style.display = 'flex';
+            
+            if(t==='cases') renderCasesInGrid(); 
+            if(t==='upgrader'){clearUpgrader();renderUpgraderInv();}
+            if(t==='tradeup'){clearTradeup();renderTradeupInv();} 
+            if(t==='coinflip'){clearCoinflip();renderCoinflipInv();}
+            if(t==='blackjack'){clearBjBet();renderBjInv();}
+            if(t==='points') { renderPointsShop(); } 
+            if(t==='battle'){renderBattleCasesGrid();updateBattleQueueUI();}
+        }
+
+        // EKWIPUNEK
+        function openInventoryModal() { renderInventory(); document.getElementById('inventoryModal').classList.add('active'); }
+        function closeInventoryModal() { document.getElementById('inventoryModal').classList.remove('active'); }
+        function closeModalOnOutsideClick(e, id, f) { if(e.target.id===id) f(); }
+        function renderInventory() {
+            const g=document.getElementById('inventoryGrid'); g.innerHTML='';
+            document.getElementById('inventoryTotalValue').innerText=inventory.reduce((s,i)=>s+parseFloat(i.savedPrice||0),0).toFixed(2)+" PLN";
+            [...inventory].reverse().forEach((item, rIdx) => {
+                let d = document.createElement('div'); d.innerHTML=genCardHTML(item, `<button class="inv-sell-btn" onclick="sellFromInventory(${inventory.length-1-rIdx})">Sprzedaj</button>`);
+                g.appendChild(d.firstElementChild);
+            });
+        }
+        function sellAllInventory() { updateBalance(inventory.reduce((s,i)=>s+parseFloat(i.savedPrice||0),0)); inventory=[]; renderInventory(); clearUpgrader(); clearTradeup(); clearCoinflip(); clearBjBet(); }
+        function sellFromInventory(i) { updateBalance(parseFloat(inventory[i].savedPrice)); inventory.splice(i,1); renderInventory(); clearUpgrader(); clearTradeup(); clearCoinflip(); clearBjBet(); }
+
+        // RULETKI (SKRZYNIE)
+        let currentCaseQty = 1; let currentWon = [];
+        function renderCasesInGrid() {
+            const g = document.getElementById('casesGrid'); g.innerHTML='';
+            casesData.forEach(c => {
+                let d = document.createElement('div'); d.className='case-card'; d.onclick=()=>openRoulette(c.id);
+                let img = localCaseImages[c.name]||'📦'; d.innerHTML=`<div class="case-image-wrapper">${img.includes('.')?`<img src="${img}">`:`<div style="font-size:70px">${img}</div>`}</div><div class="case-name">${c.name}</div><div class="case-price">${c.price.toFixed(2)} PLN</div>`;
+                g.appendChild(d);
+            });
+        }
+        function setRollQuantity(q, btn) {
+            if(isRolling) return; currentCaseQty = q;
+            document.querySelectorAll('#caseQuantitySelector .mult-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+            let c = document.getElementById('rouletteContainers'); c.innerHTML='';
+            for(let i=0; i<q; i++) {
+                c.innerHTML+=`<div class="roulette-wrapper"><div class="selector"></div><div class="case-roll" id="caseRoll-${i}"></div></div>`;
+                if(currentCase) { let r=document.getElementById(`caseRoll-${i}`); for(let j=0;j<10;j++) r.appendChild(createSimpleItem(rollItem(currentCase.items))); }
+            }
+        }
+        function createSimpleItem(i) {
+            let d = document.createElement('div'); d.className=`item ${i.tier}`;
+            d.innerHTML=`<img src="${getImg(i.name)}"><span>${i.name}</span><div style="font-size:9px;color:#fff;background:rgba(0,0,0,0.5);padding:2px 4px;border-radius:3px;margin-top:2px;">${i.wear==="Factory New"?"FN":i.wear==="Minimal Wear"?"MW":i.wear==="Field-Tested"?"FT":i.wear==="Well-Worn"?"WW":"BS"}</div>`; return d;
+        }
+        
+        // PODGLĄD ZAWARTOŚCI SKRZYNI (NAPRAWIONO)
+        function renderCaseContents() {
+            const contentsGrid = document.getElementById('caseContentsGrid');
+            if (contentsGrid) {
+                contentsGrid.innerHTML = '';
+                [...currentCase.items].sort((a, b) => tierHierarchy.indexOf(b.tier) - tierHierarchy.indexOf(a.tier)).forEach(item => {
+                    const div = document.createElement('div'); div.className = `content-item ${item.tier}`;
+                    const imgUrl = getImg(item.name);
+                    div.innerHTML = `<img src="${imgUrl}" onerror="this.style.display='none';"><div class="content-item-name">${item.name}</div>`;
+                    contentsGrid.appendChild(div);
+                });
+            }
+        }
+        
+        function openRoulette(id) {
+            currentCase = casesData.find(c=>c.id===id); document.getElementById('rouletteTitleDisplay').innerText=`Otwieranie: ${currentCase.name}`;
+            document.getElementById('rouletteModal').classList.add('active'); document.getElementById('caseQuantitySelector').style.display='flex';
+            setRollQuantity(1, document.querySelectorAll('#caseQuantitySelector .mult-btn')[0]);
+            document.getElementById('resultActions').style.display='none'; document.getElementById('openBtn').style.display='block'; document.getElementById('openBtn').disabled=false; document.getElementById('result').innerText="Gotowy?";
+            renderCaseContents(); // WYWOŁANIE PODGLĄDU
+        }
+        
+        function closeRouletteModal() { if(!isRolling) document.getElementById('rouletteModal').classList.remove('active'); }
+        
+        function openCase() {
+            let cost = currentCase.price * currentCaseQty; if(balance < cost) return alert("Brak środków!");
+            isRolling = true; updateBalance(-cost); document.getElementById('openBtn').style.display='none'; document.getElementById('caseQuantitySelector').style.display='none'; document.getElementById('result').innerText="Losowanie...";
+            currentWon=[]; let tickInt = setInterval(playTick, 150);
+            for(let k=0; k<currentCaseQty; k++) {
+                let roll = document.getElementById(`caseRoll-${k}`); roll.innerHTML=''; roll.style.transition='none'; roll.style.transform='translateX(0)';
+                for(let i=0; i<80; i++) roll.appendChild(createSimpleItem(rollItem(currentCase.items)));
+                let w = rollItem(currentCase.items); w.savedPrice = getPrice(w.tier, w.wearMultiplier, w.isStatTrak);
+                currentWon.push(w); roll.replaceChild(createSimpleItem(w), roll.children[75]);
+                setTimeout(()=>{ roll.style.transition="transform 6s cubic-bezier(0.1, 0, 0.05, 1)"; roll.style.transform=`translateX(-${(75*171)-(roll.parentElement.offsetWidth/2)+85+(Math.random()*100-50)}px)`; }, 50);
+            }
+            setTimeout(() => {
+                clearInterval(tickInt); let html="", tot=0, hTier=0;
+                currentWon.forEach(w=>{ tot+=parseFloat(w.savedPrice); html+=`<div class="${w.tier}" style="margin:5px; padding: 5px; background:rgba(0,0,0,0.5); border-radius:5px;">${w.name} (${w.savedPrice} PLN)</div>`; let ti=tierHierarchy.indexOf(w.tier); if(ti>hTier)hTier=ti; });
+                document.getElementById('result').innerHTML = html; document.getElementById('sellPriceDisplay').innerText = tot.toFixed(2);
+                document.getElementById('resultActions').style.display='flex'; isRolling = false;
+                if(hTier >= 2) { playEpic(); shakeScreen(); shootConfetti(); } else playWin();
+            }, 6100);
+        }
+        function sellWonItem() { updateBalance(currentWon.reduce((s,i)=>s+parseFloat(i.savedPrice),0)); resetRoulUI(); }
+        function keepWonItem() { currentWon.forEach(i=>inventory.push(i)); saveData(); resetRoulUI(); }
+        function resetRoulUI() { document.getElementById('resultActions').style.display='none'; document.getElementById('openBtn').style.display='block'; document.getElementById('caseQuantitySelector').style.display='flex'; setRollQuantity(currentCaseQty, document.querySelectorAll('#caseQuantitySelector .mult-btn')[currentCaseQty-1]); document.getElementById('result').innerText="Kolejna?"; }
+
+        // BATTLE MULTIPLAYER LOGIC
+        let battleBotsCount = 1; let battleQueue = []; let battlePlayers = []; let battleRound = 0;
+        const botProfiles = [{ name: "Bot Seba", avatar: "😎" }, { name: "Bot Karyna", avatar: "👩🏼" }, { name: "Bot Janusz", avatar: "👴🏻" }];
+        
+        function selectBattleBots(c, btn) { 
+            if(battleActive) return; 
+            battleBotsCount = c; 
+            document.querySelectorAll('.battle-bots-selector .mult-btn').forEach(b=>b.classList.remove('active')); 
+            btn.classList.add('active'); 
+        }
+        function renderBattleCasesGrid() {
+            const g = document.getElementById('battleCasesGrid'); g.innerHTML='';
+            casesData.forEach(c => {
+                let d = document.createElement('div'); d.className='case-card'; d.onclick=()=>{if(battleQueue.length<20){battleQueue.push(c);updateBattleQueueUI();}else alert("Max 20!");};
+                let img = localCaseImages[c.name]||'📦'; d.innerHTML=`<div class="case-image-wrapper">${img.includes('.')?`<img src="${img}">`:`<div style="font-size:70px">${img}</div>`}</div><div class="case-name">${c.name}</div><div class="case-price">${c.price.toFixed(2)} PLN</div>`; g.appendChild(d);
+            });
+        }
+        function clearBattleQueue() { battleQueue=[]; updateBattleQueueUI(); }
+        function removeCaseFromBattle(i) { battleQueue.splice(i,1); updateBattleQueueUI(); }
+        function updateBattleQueueUI() {
+            const q = document.getElementById('battleQueue'); q.innerHTML=''; let tot=0;
+            if(battleQueue.length===0) q.innerHTML='<span style="color:#8b8b9e; width:100%; text-align:center;">Kliknij skrzynie z dołu by dodać.</span>';
+            else battleQueue.forEach((c,i)=>{ tot+=c.price; let img=localCaseImages[c.name]||'📦'; q.innerHTML+=`<div class="queue-item" onclick="removeCaseFromBattle(${i})">${img.includes('.')?`<img src="${img}">`:`<div style="font-size:40px">${img}</div>`}<div class="remove-overlay">X</div></div>`; });
+            document.getElementById('battleTotalCost').innerText=`KOSZT: ${tot.toFixed(2)} PLN`; document.getElementById('btnStartBattle').disabled = battleQueue.length===0 || balance<tot;
+        }
+
+        // --- SOCKET.IO ZDARZENIA ---
+        let socket;
+        try { socket = io(); } catch(e) { console.log("Brak połączenia z serwerem. Gramy offline."); }
+
+        if (socket) {
+            socket.on('battleAvailable', (len) => {
+                document.getElementById('btnJoinOnline').style.display = 'block';
+                document.getElementById('btnJoinOnline').innerText = `DOŁĄCZ DO GRACZA ONLINE (${len} Skrzynek)`;
+            });
+
+            socket.on('hideBattleJoin', () => {
+                document.getElementById('btnJoinOnline').style.display = 'none';
+            });
+
+            socket.on('battleError', (msg) => {
+                alert(msg);
+                document.getElementById('battleArenaContainer').style.display='none'; 
+                document.getElementById('battleSetup').style.display='flex';
+                battleActive = false;
+            });
+
+            socket.on('startBattleClient', (data) => {
+                let tot = data.queue.reduce((s,c)=>s+c.price,0); 
+                if(balance < tot) { alert("Brak środków na dołączenie!"); return; }
+                updateBalance(-tot);
+                
+                battleActive = true;
+                document.getElementById('btnJoinOnline').style.display = 'none';
+                document.getElementById('battleSetup').style.display = 'none';
+                document.getElementById('battleArenaContainer').style.display = 'flex';
+                document.getElementById('btnFinishBattle').style.display = 'none';
+
+                battleQueue = data.queue;
+                battlePlayers = [
+                    { id: 0, name: "Ty", avatar: "👤", score: 0, items: [], isPl: true, preRolledDrops: data.myDrops },
+                    { id: 1, name: data.opponentName, avatar: "🔥", score: 0, items: [], isPl: false, preRolledDrops: data.opponentDrops }
+                ];
+
+                const a = document.getElementById('battleArena'); let aHtml='';
+                battlePlayers.forEach(p=>{ aHtml+=`<div class="battle-lane" id="lane-${p.id}"><div style="font-size:50px;margin-bottom:10px;">${p.avatar}</div><div style="font-weight:900;color:#fff;">${p.name}</div><div style="color:#00e5ff;font-size:24px;font-weight:900;margin:10px 0;" id="score-${p.id}">0.00 PLN</div><div id="cdrop-${p.id}" style="height:120px;display:flex;align-items:center;justify-content:center;width:100%;border-bottom:1px solid #2d2642;margin-bottom:10px;"><span style="color:#8b8b9e;">Oczekuję...</span></div><div class="battle-history" id="history-${p.id}" style="width:100%;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div></div>`; });
+                a.innerHTML = aHtml; battleRound=0; 
+                
+                setTimeout(playNextBattleRound, 500);
+            });
+        }
+
+        function joinOnlineBattle() {
+            if(socket) socket.emit('joinBattle');
+        }
+
+        function startBattle() {
+            try {
+                let tot = battleQueue.reduce((s,c)=>s+c.price,0); if(balance<tot) return alert("Brak środków!");
+                
+                // Jeśli wybrano ONLINE
+                if (battleBotsCount === 'online') {
+                    if(!socket) return alert("Brak połączenia z serwerem!");
+                    socket.emit('createBattle', battleQueue);
+                    document.getElementById('battleSetup').style.display='none'; 
+                    document.getElementById('battleArenaContainer').style.display='flex';
+                    document.getElementById('battleRoundInfo').innerText = "OCZEKIWANIE NA PRZECIWNIKA...";
+                    document.getElementById('battleArena').innerHTML = '<h3 style="color:#8b8b9e;">Otwórz drugą kartę w przeglądarce i kliknij "Dołącz do Gracza Online".</h3>';
+                    return;
+                }
+
+                // Zwykła gra z botami
+                updateBalance(-tot);
+                battleActive=true; document.getElementById('battleSetup').style.display='none'; document.getElementById('battleArenaContainer').style.display='flex'; document.getElementById('btnFinishBattle').style.display='none';
+                battlePlayers=[{id:0,name:"Ty",avatar:"👤",score:0,items:[],isPl:true}];
+                for(let i=0;i<battleBotsCount;i++) battlePlayers.push({id:i+1,name:botProfiles[i].name,avatar:botProfiles[i].avatar,score:0,items:[],isPl:false});
+                const a = document.getElementById('battleArena'); let aHtml='';
+                battlePlayers.forEach(p=>{ aHtml+=`<div class="battle-lane" id="lane-${p.id}"><div style="font-size:50px;margin-bottom:10px;">${p.avatar}</div><div style="font-weight:900;color:#fff;">${p.name}</div><div style="color:#00e5ff;font-size:24px;font-weight:900;margin:10px 0;" id="score-${p.id}">0.00 PLN</div><div id="cdrop-${p.id}" style="height:120px;display:flex;align-items:center;justify-content:center;width:100%;border-bottom:1px solid #2d2642;margin-bottom:10px;"><span style="color:#8b8b9e;">Oczekuję...</span></div><div class="battle-history" id="history-${p.id}" style="width:100%;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div></div>`; });
+                a.innerHTML = aHtml; battleRound=0; setTimeout(playNextBattleRound, 500);
+            } catch(e) { console.error("Error startBattle", e); }
+        }
+
+        function createBattleItem(i) { let d=document.createElement('div'); d.className=`item ${i.tier}`; d.style.minWidth="110px"; d.innerHTML=`<img src="${getImg(i.name)}" style="width:70px;height:50px;"><span style="font-size:9px;">${i.name}</span>`; return d; }
+        
+        function playNextBattleRound() {
+            try {
+                if(battleRound>=battleQueue.length) { endBattle(); return; }
+                let cObj = battleQueue[battleRound]; document.getElementById('battleRoundInfo').innerText = `RUNDA ${battleRound+1} / ${battleQueue.length}: ${cObj.name}`;
+                let t = setInterval(playTick, 200);
+                battlePlayers.forEach(p => {
+                    let box = document.getElementById(`cdrop-${p.id}`);
+                    box.innerHTML = `<div style="position:relative;width:100%;height:110px;background:#0d0b14;border-radius:8px;overflow:hidden;"><div style="position:absolute;left:50%;width:3px;height:100%;background:#00e5ff;z-index:10;transform:translateX(-50%);"></div><div id="broll-${p.id}" style="display:flex;position:absolute;height:100%;"></div></div>`;
+                    let roll = document.getElementById(`broll-${p.id}`);
+                    
+                    let rI;
+                    if(p.preRolledDrops) {
+                        rI = p.preRolledDrops[battleRound]; // Bierzemy z serwera
+                    } else {
+                        rI = rollItem(cObj.items); 
+                        rI.savedPrice = getPrice(rI.tier, rI.wearMultiplier, rI.isStatTrak); 
+                    }
+                    p.currDrop = rI;
+                    
+                    for(let i=0;i<60;i++) roll.appendChild(createBattleItem(i===55?rI:rollItem(cObj.items)));
+                    setTimeout(()=>{ roll.style.transition="transform 5s cubic-bezier(0.1, 0, 0.05, 1)"; roll.style.transform=`translateX(-${(55*111)-(roll.parentElement?.offsetWidth||200)/2+55+(Math.random()*60-30)}px)`; }, 50);
+                });
+                setTimeout(()=>{
+                    clearInterval(t); playWin();
+                    battlePlayers.forEach(p=>{
+                        let i=p.currDrop; p.items.push(i); p.score+=parseFloat(i.savedPrice); document.getElementById(`score-${p.id}`).innerText=p.score.toFixed(2)+" PLN";
+                        let hHtml = `<div class="${i.tier}" style="background:rgba(0,0,0,0.4);border-radius:5px;padding:5px;text-align:center;border-bottom:2px solid;"><img src="${getImg(i.name)}" style="height:40px;"><div style="font-size:10px;color:#fff;">${i.name}</div><div style="font-size:12px;color:#00e5ff;font-weight:bold;">${i.savedPrice} PLN</div></div>`;
+                        document.getElementById(`cdrop-${p.id}`).innerHTML = hHtml; document.getElementById(`history-${p.id}`).insertAdjacentHTML('afterbegin', hHtml);
+                    });
+                    battleRound++; setTimeout(playNextBattleRound, 1500);
+                }, 5500);
+            } catch(e) { console.error("Error in playNextBattleRound", e); }
+        }
+        function endBattle() {
+            let max=-1, wins=[]; battlePlayers.forEach(p=>{if(p.score>max){max=p.score;wins=[p];}else if(p.score===max)wins.push(p);});
+            wins.forEach(w=>document.getElementById(`lane-${w.id}`).classList.add('winner'));
+            if(wins.some(w=>w.isPl)) { document.getElementById('battleRoundInfo').innerHTML="<span style='color:#00e5ff;'>🏆 ZWYCIĘSTWO! 🏆</span>"; let all=[]; battlePlayers.forEach(p=>all=all.concat(p.items)); currentWon=all; playEpic(); shakeScreen(); shootConfetti(); } 
+            else { document.getElementById('battleRoundInfo').innerHTML="<span style='color:#ff003c;'>💀 PRZEGRAŁEŚ 💀</span>"; currentWon=[]; playError(); }
+            document.getElementById('btnFinishBattle').style.display='block';
+        }
+        function finishBattle() { currentWon.forEach(i=>inventory.push(i)); saveData(); battleActive=false; document.getElementById('battleArenaContainer').style.display='none'; document.getElementById('battleSetup').style.display='flex'; clearBattleQueue(); }
+
+        // PUNKTY
+        function renderPointsShop() {
+            const g = document.getElementById('pointsShopGrid'); g.innerHTML='';
+            shopItems.forEach((i, idx) => { g.innerHTML+=`<div class="content-item ${i.tier}"><img src="${getImg(i.name)}"><div class="content-item-name">${i.name}</div><div style="color:#ffea00;font-weight:bold;font-size:12px;margin:5px 0;">${i.price} ⚡</div><button class="mult-btn" onclick="buyShopItem(${idx})">KUP</button></div>`; });
+        }
+        function buyShopItem(i) { let it=shopItems[i]; if(points>=it.price){points-=it.price;inventory.push({...it});updateUI();alert(`Kupiono ${it.name}`);}else playError(); }
+        function rollPointsGacha() {
+            let b = parseInt(document.getElementById('gachaInput').value); if(isNaN(b)||b<100) return alert("Min. 100!"); if(points<b) return playError();
+            points-=b; updateUI(); let tt=b>=50000?"gold":b>=10000?"red":b>=2500?"pink":b>=500?"purple":"blue";
+            let ti=casesData.flatMap(c=>c.items).filter(i=>i.tier===tt); if(ti.length===0) ti=casesData.flatMap(c=>c.items);
+            let w=rollItem(ti); w.savedPrice=getPrice(w.tier, w.wearMultiplier, w.isStatTrak); inventory.push(w); saveData(); playWin();
+            document.getElementById('gachaResult').innerHTML=`<span class="${w.tier}" style="padding:5px; background:rgba(0,0,0,0.5); border-radius:5px;">${w.name} (${w.savedPrice} PLN)</span>`;
+        }
+        function exchangePoints() { let e = parseInt(document.getElementById('exchangeInput').value); if(isNaN(e)||e<=0) return; if(points<e) return playError(); points-=e; updateBalance(e/100); updateUI(); playTick(); }
+
+        // UPGRADER
+        function clearUpgrader() {
+            currentUpgradeItemIndex=-1; targetUpgradeItem=null; document.getElementById('upgradeInputBox').innerHTML='<div class="placeholder-text">Wybierz z dołu</div>'; document.getElementById('upgradeTargetBox').innerHTML='<div class="placeholder-text">Wybierz mnożnik</div>';
+            document.getElementById('chanceDisplay').innerText="0.00%"; document.getElementById('winZone').style.background=`conic-gradient(#00e5ff 0%, #1c182b 0%)`; document.getElementById('startUpgradeBtn').disabled=true;
+            document.getElementById('upgraderResultMsg').innerText=''; document.querySelectorAll('.upgrader-multipliers .mult-btn').forEach(b=>b.classList.remove('active'));
+            document.getElementById('upgraderPointerContainer').style.transition='none'; document.getElementById('upgraderPointerContainer').style.transform='rotate(0deg)';
+        }
+        function renderUpgraderInv() {
+            const g = document.getElementById('upgraderInventoryGrid'); g.innerHTML='';
+            [...inventory].reverse().forEach((item, rIdx) => { let realIdx = inventory.length-1-rIdx; let d=document.createElement('div'); d.innerHTML=genCardHTML(item); d.firstElementChild.onclick=()=>selectUpgradeItem(realIdx); g.appendChild(d.firstElementChild); });
+        }
+        function selectUpgradeItem(i) {
+            if(isUpgrading) return; currentUpgradeItemIndex=i; document.getElementById('upgradeInputBox').innerHTML=genCardHTML(inventory[i]); document.getElementById('upgradeInputBox').firstElementChild.style.width='100%';
+            targetUpgradeItem=null; document.getElementById('upgradeTargetBox').innerHTML='<div class="placeholder-text">Wybierz mnożnik</div>'; document.getElementById('chanceDisplay').innerText="0.00%"; document.getElementById('winZone').style.background=`conic-gradient(#00e5ff 0%, #1c182b 0%)`;
+            document.getElementById('startUpgradeBtn').disabled=true; document.querySelectorAll('.upgrader-multipliers .mult-btn').forEach(b=>b.classList.remove('active'));
+        }
+        function setMultiplier(m, btn) {
+            if(isUpgrading||currentUpgradeItemIndex===-1) return; document.querySelectorAll('.upgrader-multipliers .mult-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+            let tPrice = parseFloat(inventory[currentUpgradeItemIndex].savedPrice)*m;
+            let all = casesData.flatMap(c=>c.items); let best=all[0]; let diff=Infinity;
+            for(let i=0;i<200;i++){ let b=all[Math.floor(Math.random()*all.length)]; let w={name:"Field-Tested",m:1.0}; let st=Math.random()<0.2; let p=getPrice(b.tier,w.m,st); if(Math.abs(p-tPrice)<diff){diff=Math.abs(p-tPrice);best={...b,wear:w.name,wearMultiplier:w.m,isStatTrak:st,savedPrice:p};} }
+            targetUpgradeItem = best; document.getElementById('upgradeTargetBox').innerHTML=genCardHTML(best); document.getElementById('upgradeTargetBox').firstElementChild.style.width='100%';
+            let ch = Math.min(((1/m)*0.90)*100, 99); document.getElementById('chanceDisplay').innerText=ch.toFixed(2)+"%"; document.getElementById('winZone').style.background=`conic-gradient(#00e5ff 0% ${ch}%, #1c182b ${ch}% 100%)`; document.getElementById('startUpgradeBtn').disabled=false; playTick();
+        }
+        function startUpgrade() {
+            if(isUpgrading||currentUpgradeItemIndex===-1||!targetUpgradeItem) return; isUpgrading=true; document.getElementById('startUpgradeBtn').disabled=true; document.getElementById('upgraderResultMsg').innerText='';
+            let ch = parseFloat(document.getElementById('chanceDisplay').innerText); let isWin = (Math.random()*100)<=ch;
+            let ptr = document.getElementById('upgraderPointerContainer'); ptr.style.transition="none"; ptr.style.transform="rotate(0deg)"; void ptr.offsetWidth;
+            let ang = (5*360) + (isWin ? (Math.random()*(ch/100)*360) : ((ch/100)*360 + Math.random()*(360-(ch/100)*360)));
+            ptr.style.transition="transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)"; ptr.style.transform=`rotate(${ang}deg)`; let t=setInterval(playTick, 100);
+            setTimeout(() => {
+                clearInterval(t); let msg = document.getElementById('upgraderResultMsg');
+                if(isWin) { inventory.splice(currentUpgradeItemIndex,1); inventory.push(targetUpgradeItem); msg.innerHTML='<span style="color:#00e5ff">Sukces!</span>'; playWin(); } 
+                else { inventory.splice(currentUpgradeItemIndex,1); msg.innerHTML='<span style="color:#ff003c">Spalone.</span>'; playError(); }
+                saveData(); renderUpgraderInv(); setTimeout(()=>{clearUpgrader(); isUpgrading=false;}, 2500);
+            }, 4100);
+        }
+
+        // TRADE UP
+        let tradeupItems=[], tradeupTargetTier=null;
+        function clearTradeup() { tradeupItems=[]; tradeupTargetTier=null; renderTradeupSlots(); renderTradeupInv(); }
+        function renderTradeupSlots() {
+            let g = document.getElementById('tradeupGrid'); g.innerHTML='';
+            for(let i=0;i<10;i++) {
+                let d = document.createElement('div'); d.className='tradeup-slot'+(tradeupItems[i]?' filled':'');
+                if(tradeupItems[i]) { d.innerHTML=`<img src="${getImg(tradeupItems[i].name)}" style="width:70%;">`; d.onclick=()=>{inventory.push(tradeupItems[i]);tradeupItems.splice(i,1);if(tradeupItems.length===0)tradeupTargetTier=null;renderTradeupSlots();renderTradeupInv();playTick();}; }
+                else d.innerHTML='<span style="color:#483d6b;font-size:24px;">+</span>'; g.appendChild(d);
+            }
+            document.getElementById('tradeupCount').innerText = tradeupItems.length; document.getElementById('btnDoTradeup').disabled = tradeupItems.length!==10;
+        }
+        function renderTradeupInv() {
+            const g = document.getElementById('tradeupInventoryGrid'); g.innerHTML='';
+            [...inventory].reverse().forEach((item, rIdx) => {
+                let realIdx = inventory.length-1-rIdx;
+                if(item.tier==='gold') return; if(tradeupTargetTier && item.tier!==tradeupTargetTier) return;
+                let d = document.createElement('div'); d.innerHTML=genCardHTML(item);
+                d.firstElementChild.onclick=()=>{if(tradeupItems.length<10){if(tradeupItems.length===0)tradeupTargetTier=item.tier; tradeupItems.push(item); inventory.splice(realIdx,1); renderTradeupSlots(); renderTradeupInv(); playTick();}};
+                g.appendChild(d.firstElementChild);
+            });
+        }
+        function executeTradeup() {
+            if(tradeupItems.length!==10) return; let tIdx = tierHierarchy.indexOf(tradeupTargetTier); let nTier = tierHierarchy[tIdx+1];
+            let nItems = casesData.flatMap(c=>c.items).filter(i=>i.tier===nTier); if(nItems.length===0) return alert("Brak itemów wyższego tieru w bazie!");
+            let b = nItems[Math.floor(Math.random()*nItems.length)]; let won = {...b, wear:"Factory New", wearMultiplier:2.5, isStatTrak:false}; won.savedPrice = getPrice(won.tier, won.wearMultiplier, false);
+            tradeupItems=[]; inventory.push(won); saveData(); playEpic(); shootConfetti(); shakeScreen(); clearTradeup(); alert(`Otrzymałeś:\n${won.name} (${won.savedPrice} PLN)`);
+        }
+
+        // COINFLIP
+        let cfPlayerItem=null, cfPlayerIndex=-1, cfBotItem=null;
+        function clearCoinflip() {
+            cfPlayerItem=null; cfPlayerIndex=-1; cfBotItem=null;
+            let p=document.getElementById('cfPlayerSlot'); p.innerHTML='Wybierz z dołu'; p.style.borderStyle='dashed'; p.style.borderColor='#483d6b';
+            let b=document.getElementById('cfBotSlot'); b.innerHTML='Czekam...'; b.style.borderStyle='dashed'; b.style.borderColor='#483d6b';
+            document.getElementById('btnDoCoinflip').disabled=true; document.getElementById('cfCoin').style.transform='rotateY(0deg)';
+        }
+        function renderCoinflipInv() {
+            const g = document.getElementById('coinflipInventoryGrid'); g.innerHTML='';
+            [...inventory].reverse().forEach((item, rIdx) => {
+                let realIdx = inventory.length-1-rIdx; let d = document.createElement('div'); d.innerHTML=genCardHTML(item);
+                d.firstElementChild.onclick=()=>{
+                    cfPlayerItem=item; cfPlayerIndex=realIdx;
+                    let p=document.getElementById('cfPlayerSlot'); p.innerHTML=`<img src="${getImg(item.name)}" style="width:80%;"><br><b style="color:#00e5ff">${item.savedPrice} PLN</b>`; p.style.borderStyle='solid'; p.style.borderColor='#00e5ff';
+                    let botIt = casesData.flatMap(c=>c.items); let bBase = botIt[Math.floor(Math.random()*botIt.length)];
+                    cfBotItem = {...bBase, wear:"Field-Tested", isStatTrak:false, savedPrice: (parseFloat(item.savedPrice)*(0.85+Math.random()*0.3)).toFixed(2)};
+                    let bs=document.getElementById('cfBotSlot'); bs.innerHTML=`<img src="${getImg(bBase.name)}" style="width:80%;"><br><b style="color:#ff003c">${cfBotItem.savedPrice} PLN</b>`; bs.style.borderStyle='solid'; bs.style.borderColor='#ff003c';
+                    document.getElementById('btnDoCoinflip').disabled=false; playTick();
+                }; g.appendChild(d.firstElementChild);
+            });
+        }
+        function executeCoinflip() {
+            if(!cfPlayerItem||!cfBotItem) return; document.getElementById('btnDoCoinflip').disabled=true;
+            let c=document.getElementById('cfCoin'); let isWin=Math.random()>0.5; let sp = 10+(isWin?0:0.5);
+            c.style.transition="transform 3s cubic-bezier(0.2, 0.8, 0.2, 1)"; c.style.transform=`rotateY(${sp*360}deg)`;
+            let t = setInterval(playTick, 200);
+            setTimeout(()=>{
+                clearInterval(t); document.querySelector('.coin-inner').innerText = isWin?"CT":"T";
+                if(isWin){ playEpic(); shootConfetti(); inventory.push(cfBotItem); alert(`Wygrałeś: ${cfBotItem.name}!`); }
+                else { playError(); inventory.splice(cfPlayerIndex,1); alert(`Przegrałeś: ${cfPlayerItem.name}...`); }
+                saveData(); setTimeout(clearCoinflip, 2000); renderCoinflipInv();
+            }, 3000);
+        }
+
+        // BLACKJACK
+        let bjBetItems = []; let bjDeck = []; let bjPlayerCards = []; let bjDealerCards = []; let bjState = 'setup';
+        function clearBjBet() {
+            if(bjState==='playing'||bjState==='dealerTurn') return;
+            bjBetItems.forEach(i=>inventory.push(i)); bjBetItems=[]; bjState='setup';
+            document.getElementById('bjPlayerCardsContainer').innerHTML=''; document.getElementById('bjDealerCardsContainer').innerHTML='';
+            document.getElementById('bjPlayerScore').innerText='0'; document.getElementById('bjDealerScore').innerText='0';
+            document.getElementById('bjGameStatus').innerText=''; document.getElementById('bjControls').style.display='none'; document.getElementById('bjSetupControls').style.display='flex';
+            saveData(); renderBjInv(); updateBjBetUI();
+        }
+        function renderBjInv() {
+            const g = document.getElementById('bjInventoryGrid'); g.innerHTML='';
+            [...inventory].reverse().forEach((item, rIdx) => {
+                let realIdx = inventory.length-1-rIdx; let d = document.createElement('div'); d.innerHTML=genCardHTML(item);
+                d.firstElementChild.onclick=()=>{ if(bjState!=='setup')return; if(bjBetItems.length>=10)return alert("Max 10!"); bjBetItems.push(item); inventory.splice(realIdx,1); playTick(); renderBjInv(); updateBjBetUI(); };
+                g.appendChild(d.firstElementChild);
+            });
+        }
+        function updateBjBetUI() {
+            const c = document.getElementById('bjBetContainer'); let tot = 0; c.innerHTML='';
+            if(bjBetItems.length===0) c.innerHTML='<span style="color:#8b8b9e; font-style:italic;">Kliknij skiny poniżej...</span>';
+            else bjBetItems.forEach(i=>{ tot+=parseFloat(i.savedPrice); c.innerHTML+=`<img src="${getImg(i.name)}" style="height:60px;filter:drop-shadow(0 4px 4px rgba(0,0,0,0.5));">`; });
+            document.getElementById('bjTotalBet').innerText=tot.toFixed(2)+" PLN"; document.getElementById('btnStartBj').disabled=bjBetItems.length===0;
+        }
+        function buildDeck() {
+            const s=['♠','♥','♦','♣'], v=['2','3','4','5','6','7','8','9','10','J','Q','K','A']; let d=[];
+            for(let i=0;i<4;i++) for(let st of s) for(let val of v) d.push({suit:st, value:val, isRed:(st==='♥'||st==='♦')});
+            for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; } return d;
+        }
+        function getCardScore(cards) {
+            let sc=0, aces=0; cards.forEach(c=>{ if(c.value==='A'){aces++;sc+=11;} else if(['J','Q','K'].includes(c.value))sc+=10; else sc+=parseInt(c.value); });
+            while(sc>21&&aces>0){sc-=10;aces--;} return sc;
+        }
+        function renderCardHTML(c, hid=false) {
+            if(hid) return `<div class="bj-card bj-card-hidden">?</div>`;
+            return `<div class="bj-card ${c.isRed?'red':''}">${c.value}<br><span style="font-size:16px;">${c.suit}</span></div>`;
+        }
+        function startBj() {
+            if(bjBetItems.length===0) return; bjState='playing'; document.getElementById('bjSetupControls').style.display='none'; document.getElementById('bjControls').style.display='flex'; document.getElementById('bjGameStatus').innerText='';
+            bjDeck=buildDeck(); bjPlayerCards=[bjDeck.pop(),bjDeck.pop()]; bjDealerCards=[bjDeck.pop(),bjDeck.pop()]; saveData(); updateBjBoard();
+            let pS=getCardScore(bjPlayerCards), dS=getCardScore(bjDealerCards); if(pS===21){if(dS===21)endBj('push');else endBj('blackjack');}
+        }
+        function updateBjBoard(hidDeal=true) {
+            let pC=document.getElementById('bjPlayerCardsContainer'), dC=document.getElementById('bjDealerCardsContainer'); pC.innerHTML=''; dC.innerHTML='';
+            bjPlayerCards.forEach(c=>pC.innerHTML+=renderCardHTML(c)); document.getElementById('bjPlayerScore').innerText=getCardScore(bjPlayerCards);
+            if(hidDeal&&bjState==='playing') { dC.innerHTML+=renderCardHTML(bjDealerCards[0]); dC.innerHTML+=renderCardHTML(null,true); document.getElementById('bjDealerScore').innerText=(bjDealerCards[0].value==='A'?11:(['J','Q','K'].includes(bjDealerCards[0].value)?10:parseInt(bjDealerCards[0].value))); } 
+            else { bjDealerCards.forEach(c=>dC.innerHTML+=renderCardHTML(c)); document.getElementById('bjDealerScore').innerText=getCardScore(bjDealerCards); } playTick();
+        }
+        function hitBj() { if(bjState!=='playing')return; bjPlayerCards.push(bjDeck.pop()); updateBjBoard(); let pS=getCardScore(bjPlayerCards); if(pS>21)endBj('lose'); else if(pS===21)standBj(); }
+        function standBj() {
+            if(bjState!=='playing')return; bjState='dealerTurn'; document.getElementById('bjControls').style.display='none'; updateBjBoard(false);
+            let dP = setInterval(() => {
+                if(getCardScore(bjDealerCards)<17) { bjDealerCards.push(bjDeck.pop()); updateBjBoard(false); } 
+                else { clearInterval(dP); let pS=getCardScore(bjPlayerCards), dS=getCardScore(bjDealerCards); if(dS>21)endBj('win'); else if(pS>dS)endBj('win'); else if(dS>pS)endBj('lose'); else endBj('push'); }
+            }, 800);
+        }
+        function endBj(res) {
+            bjState='gameOver'; document.getElementById('bjControls').style.display='none'; updateBjBoard(false); let sEl=document.getElementById('bjGameStatus'), tBet=bjBetItems.reduce((s,i)=>s+parseFloat(i.savedPrice),0);
+            setTimeout(() => {
+                if(res==='win'||res==='blackjack') {
+                    sEl.innerText=res==='blackjack'?"BLACKJACK!":"WYGRAŁEŚ!"; sEl.style.color="#00e5ff"; playEpic(); shootConfetti(); bjBetItems.forEach(i=>inventory.push(i));
+                    let tVal=res==='blackjack'?tBet*1.5:tBet; let all=casesData.flatMap(c=>c.items); let best=all[0]; let diff=Infinity;
+                    for(let i=0;i<300;i++){ let b=all[Math.floor(Math.random()*all.length)]; let w={name:"Field-Tested",m:1.0}; let st=Math.random()<0.2; let p=getPrice(b.tier,w.m,st); if(Math.abs(p-tVal)<diff){diff=Math.abs(p-tVal);best={...b,wear:w.name,wearMultiplier:w.m,isStatTrak:st,savedPrice:p};} }
+                    inventory.push(best); alert(`Zyskujesz: ${best.name} (${best.savedPrice} PLN)`);
+                } else if(res==='push') { sEl.innerText="REMIS"; sEl.style.color="#ffea00"; bjBetItems.forEach(i=>inventory.push(i)); playTick(); } 
+                else { sEl.innerText="PRZEGRANA!"; sEl.style.color="#ff003c"; playError(); }
+                bjBetItems=[]; saveData(); renderBjInv(); setTimeout(clearBjBet, 3000);
+            }, 500);
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
