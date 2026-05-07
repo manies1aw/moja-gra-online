@@ -135,6 +135,29 @@
         .item { min-width: 170px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,.03); text-align: center; }
         .item img { width: 130px; height: 90px; object-fit: contain; margin-bottom: 8px; }
         .item span { font-size: 11px; font-weight: 800; }
+
+/* ZAKŁADKA MISJI */
+        .quests-container { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 1000px; margin-bottom: 40px; }
+        .quest-category { background: rgba(28,24,43,0.8); border: 1px solid #2d2642; border-radius: 12px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .quest-category-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 15px; margin-bottom: 20px; }
+        .quest-category-header h2 { margin: 0; color: #00ff88; text-transform: uppercase; }
+        .quest-timer { font-weight: 800; color: #8b8b9e; background: #110e1a; padding: 5px 15px; border-radius: 8px; border: 1px solid #2d2642; }
+        .quest-list { display: flex; flex-direction: column; gap: 15px; }
+        .quest-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 15px 20px; border-radius: 8px; border-left: 4px solid #483d6b; transition: 0.3s; }
+        .quest-item.completed { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.05); }
+        .quest-info { flex: 1; margin-right: 20px; }
+        .quest-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; color: #fff; }
+        .quest-bar-bg { width: 100%; height: 8px; background: #110e1a; border-radius: 4px; overflow: hidden; }
+        .quest-bar-fill { height: 100%; background: linear-gradient(90deg, #00e5ff, #00ff88); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .quest-progress-text { font-size: 12px; font-weight: bold; color: #8b8b9e; margin-top: 5px; text-align: right; }
+        .quest-reward { font-size: 13px; font-weight: 900; color: #ffea00; margin-right: 15px; white-space: nowrap; }
+        .quest-btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .quest-btn.claim { background: #00ff88; color: #000; box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
+        .quest-btn.claim:hover { transform: scale(1.05); }
+        .quest-btn.claimed { background: #2d2642; color: #8b8b9e; cursor: not-allowed; }
+        .quest-btn.locked { background: #1c182b; color: #555; cursor: not-allowed; border: 1px solid #2d2642; }
+        .big-reward-box { margin-top: 25px; background: rgba(0, 229, 255, 0.05); border: 2px dashed #00e5ff; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .big-reward-box.unlocked { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; }
     </style>
 </head>
 <body>
@@ -149,6 +172,7 @@
             <li><a id="navCoinflip" onclick="switchTab('coinflip')">Coinflip</a></li>
             <li><a id="navBlackjack" onclick="switchTab('blackjack')">Blackjack</a></li>
             <li><a id="navPoints" onclick="switchTab('points')" style="color:#ffea00">Punkty</a></li>
+            <li><a id="navQuests" onclick="switchTab('quests')" style="color:#00ff88">Misje</a></li>
             <li><a onclick="openInventoryModal()">Ekwipunek</a></li>
         </ul>
         <div class="user-panel">
@@ -261,6 +285,12 @@
     </div>
 
     <!-- UPGRADER -->
+    <div class="game-area" id="questsArea">
+        <h1>Misje i Wyzwania</h1>
+        <div class="quests-container" id="questsContainer">
+            </div>
+    </div>
+
     <div class="game-area" id="upgraderArea">
         <div class="upgrader-main">
             <div class="upgrader-side" id="upgradeInputBox"><div class="placeholder-text">Wybierz z dołu</div></div>
@@ -538,15 +568,26 @@
         }
 
         // ZMIENNE GRY
+        // ZMIENNE GRY
         let balance = 1000.00, points = 0, inventory = [];
-        let level = 1, xp = 0, reqXp = 500, dailyClaimTime = 0; 
+        let level = 1, xp = 0, reqXp = 500, dailyClaimTime = 0;
         let isRolling = false, isUpgrading = false, battleActive = false, bjActive = false;
+        
+        let stats = { cases: 0, spent: 0, upgrades: 0, tradeups: 0, coinflips: 0 };
+        let questState = {
+            daily: { expire: 0, claims: [false,false,false,false,false], bigClaimed: false },
+            weekly: { expire: 0, claims: [false,false,false,false,false], bigClaimed: false },
+            monthly: { expire: 0, claims: [false,false,false,false,false], bigClaimed: false }
+        };
 
         function saveData() {
             localStorage.setItem('m_bal', balance); localStorage.setItem('m_pts', points);
             localStorage.setItem('m_inv', JSON.stringify(inventory)); localStorage.setItem('m_xp', xp);
             localStorage.setItem('m_lvl', level); localStorage.setItem('m_daily', dailyClaimTime);
+            localStorage.setItem('m_stats', JSON.stringify(stats));
+            localStorage.setItem('m_quests', JSON.stringify(questState));
         }
+        
         function loadData() {
             if(localStorage.getItem('m_bal')) balance = parseFloat(localStorage.getItem('m_bal'));
             if(localStorage.getItem('m_pts')) points = parseInt(localStorage.getItem('m_pts'));
@@ -554,7 +595,11 @@
             if(localStorage.getItem('m_xp')) xp = parseFloat(localStorage.getItem('m_xp'));
             if(localStorage.getItem('m_lvl')) level = parseInt(localStorage.getItem('m_lvl'));
             if(localStorage.getItem('m_daily')) dailyClaimTime = parseInt(localStorage.getItem('m_daily'));
-            reqXp = level * 500; updateUI(); checkDaily(); renderCasesInGrid();
+            
+            if(localStorage.getItem('m_stats')) { try { stats = JSON.parse(localStorage.getItem('m_stats')); } catch(e){} }
+            if(localStorage.getItem('m_quests')) { try { questState = JSON.parse(localStorage.getItem('m_quests')); } catch(e){} }
+            
+            reqXp = level * 500; updateUI(); checkDaily(); renderCasesInGrid(); checkQuestResets();
         }
 
         function updateUI() {
@@ -569,7 +614,7 @@
             while(xp >= reqXp) { xp -= reqXp; level++; reqXp = level * 500; playEpic(); shootConfetti(); alert(`Awans na poziom ${level}!`); }
             updateUI();
         }
-        function updateBalance(amount) { balance += amount; if(amount < 0) addXp(Math.abs(amount) * 1); updateUI(); }
+        function updateBalance(amount) { balance += amount; if(amount < 0) { addXp(Math.abs(amount) * 1); stats.spent += Math.abs(amount); } updateUI(); }
         function depositMoney() { updateBalance(100); alert("Dodano 100 PLN!"); }
 
         function checkDaily() {
@@ -629,6 +674,7 @@
             if(t==='blackjack'){clearBjBet();renderBjInv();}
             if(t==='points') { renderPointsShop(); } 
             if(t==='battle'){renderBattleCasesGrid();updateBattleQueueUI();}
+            if(t==='quests') { checkQuestResets(); renderQuests(); } // <-- TO JEST TA NOWA LINIJKA!
         }
 
         // EKWIPUNEK
@@ -696,7 +742,7 @@
         
         function openCase() {
             let cost = currentCase.price * currentCaseQty; if(balance < cost) return alert("Brak środków!");
-            isRolling = true; updateBalance(-cost); document.getElementById('openBtn').style.display='none'; document.getElementById('caseQuantitySelector').style.display='none'; document.getElementById('result').innerText="Losowanie...";
+            isRolling = true; updateBalance(-cost); stats.cases += currentCaseQty; document.getElementById('openBtn').style.display='none'; document.getElementById('caseQuantitySelector').style.display='none'; document.getElementById('result').innerText="Losowanie...";
             currentWon=[]; let tickInt = setInterval(playTick, 150);
             for(let k=0; k<currentCaseQty; k++) {
                 let roll = document.getElementById(`caseRoll-${k}`); roll.innerHTML=''; roll.style.transition='none'; roll.style.transform='translateX(0)';
@@ -912,7 +958,7 @@
                 clearInterval(t); let msg = document.getElementById('upgraderResultMsg');
                 if(isWin) { inventory.splice(currentUpgradeItemIndex,1); inventory.push(targetUpgradeItem); msg.innerHTML='<span style="color:#00e5ff">Sukces!</span>'; playWin(); } 
                 else { inventory.splice(currentUpgradeItemIndex,1); msg.innerHTML='<span style="color:#ff003c">Spalone.</span>'; playError(); }
-                saveData(); renderUpgraderInv(); setTimeout(()=>{clearUpgrader(); isUpgrading=false;}, 2500);
+                stats.upgrades++; saveData(); renderUpgraderInv(); setTimeout(()=>{clearUpgrader(); isUpgrading=false;}, 2500);
             }, 4100);
         }
 
@@ -942,7 +988,7 @@
             if(tradeupItems.length!==10) return; let tIdx = tierHierarchy.indexOf(tradeupTargetTier); let nTier = tierHierarchy[tIdx+1];
             let nItems = casesData.flatMap(c=>c.items).filter(i=>i.tier===nTier); if(nItems.length===0) return alert("Brak itemów wyższego tieru w bazie!");
             let b = nItems[Math.floor(Math.random()*nItems.length)]; let won = {...b, wear:"Factory New", wearMultiplier:2.5, isStatTrak:false}; won.savedPrice = getPrice(won.tier, won.wearMultiplier, false);
-            tradeupItems=[]; inventory.push(won); saveData(); playEpic(); shootConfetti(); shakeScreen(); clearTradeup(); alert(`Otrzymałeś:\n${won.name} (${won.savedPrice} PLN)`);
+            tradeupItems=[]; inventory.push(won); stats.tradeups++; saveData(); playEpic(); shootConfetti(); shakeScreen(); clearTradeup(); alert(`Otrzymałeś:\n${won.name} (${won.savedPrice} PLN)`);
         }
 
         // COINFLIP
@@ -976,7 +1022,7 @@
                 clearInterval(t); document.querySelector('.coin-inner').innerText = isWin?"CT":"T";
                 if(isWin){ playEpic(); shootConfetti(); inventory.push(cfBotItem); alert(`Wygrałeś: ${cfBotItem.name}!`); }
                 else { playError(); inventory.splice(cfPlayerIndex,1); alert(`Przegrałeś: ${cfPlayerItem.name}...`); }
-                saveData(); setTimeout(clearCoinflip, 2000); renderCoinflipInv();
+                stats.coinflips++; saveData(); setTimeout(clearCoinflip, 2000); renderCoinflipInv();
             }, 3000);
         }
 
@@ -1051,6 +1097,164 @@
         }
 
         window.onload = loadData;
+
+// ==========================================
+        // SYSTEM MISJI
+        // ==========================================
+        const questConfig = {
+            daily: {
+                title: "Misje Dzienne", color: "#00e5ff", duration: 86400000,
+                bigReward: { desc: "Nagroda Główna: 100 PLN + 500 ⚡", pln: 100, pts: 500 },
+                tasks: [
+                    { id: 'cases', desc: "Otwórz 10 skrzynek", target: 10, rewardPln: 10, rewardPts: 0 },
+                    { id: 'spent', desc: "Wydaj 500 PLN", target: 500, rewardPln: 0, rewardPts: 200 },
+                    { id: 'upgrades', desc: "Spróbuj 3 ulepszeń", target: 3, rewardPln: 20, rewardPts: 0 },
+                    { id: 'tradeups', desc: "Wykonaj 1 kontrakt", target: 1, rewardPln: 0, rewardPts: 100 },
+                    { id: 'coinflips', desc: "Zagraj 3 coinflipy", target: 3, rewardPln: 15, rewardPts: 50 }
+                ]
+            },
+            weekly: {
+                title: "Misje Tygodniowe", color: "#ff00e5", duration: 604800000,
+                bigReward: { desc: "Nagroda Główna: 1000 PLN + Skin Różowy", pln: 1000, pts: 0, skinTier: 'pink' },
+                tasks: [
+                    { id: 'cases', desc: "Otwórz 150 skrzynek", target: 150, rewardPln: 150, rewardPts: 0 },
+                    { id: 'spent', desc: "Wydaj 10 000 PLN", target: 10000, rewardPln: 0, rewardPts: 2500 },
+                    { id: 'upgrades', desc: "Spróbuj 50 ulepszeń", target: 50, rewardPln: 300, rewardPts: 0 },
+                    { id: 'tradeups', desc: "Wykonaj 15 kontraktów", target: 15, rewardPln: 0, rewardPts: 1000 },
+                    { id: 'coinflips', desc: "Zagraj 50 coinflipów", target: 50, rewardPln: 200, rewardPts: 500 }
+                ]
+            },
+            monthly: {
+                title: "Misje Miesięczne", color: "#ffd700", duration: 2592000000,
+                bigReward: { desc: "Nagroda Główna: 5000 PLN + Kosa (Złoty)", pln: 5000, pts: 0, skinTier: 'gold' },
+                tasks: [
+                    { id: 'cases', desc: "Otwórz 1000 skrzynek", target: 1000, rewardPln: 1000, rewardPts: 0 },
+                    { id: 'spent', desc: "Wydaj 100 000 PLN", target: 100000, rewardPln: 0, rewardPts: 20000 },
+                    { id: 'upgrades', desc: "Spróbuj 300 ulepszeń", target: 300, rewardPln: 1500, rewardPts: 0 },
+                    { id: 'tradeups', desc: "Wykonaj 80 kontraktów", target: 80, rewardPln: 0, rewardPts: 10000 },
+                    { id: 'coinflips', desc: "Zagraj 250 coinflipów", target: 250, rewardPln: 1000, rewardPts: 5000 }
+                ]
+            }
+        };
+
+        function checkQuestResets() {
+            let now = Date.now();
+            ['daily', 'weekly', 'monthly'].forEach(type => {
+                let s = questState[type];
+                if (now > s.expire) {
+                    s.expire = now + questConfig[type].duration;
+                    s.claims = [false, false, false, false, false];
+                    s.bigClaimed = false;
+                    if(type === 'monthly') { 
+                        stats = { cases: 0, spent: 0, upgrades: 0, tradeups: 0, coinflips: 0 };
+                    }
+                }
+            });
+            saveData();
+        }
+
+        function formatTimeLeft(ms) {
+            if (ms < 0) return "0s";
+            let d = Math.floor(ms / (1000*60*60*24));
+            let h = Math.floor((ms % (1000*60*60*24)) / (1000*60*60));
+            let m = Math.floor((ms % (1000*60*60)) / (1000*60));
+            return (d > 0 ? d + "d " : "") + h + "g " + m + "m";
+        }
+
+        function renderQuests() {
+            const container = document.getElementById('questsContainer');
+            container.innerHTML = '';
+            
+            ['daily', 'weekly', 'monthly'].forEach(type => {
+                let conf = questConfig[type]; let state = questState[type];
+                let timeLeft = state.expire - Date.now();
+                let completedCount = 0;
+                
+                let html = `<div class="quest-category" style="border-top: 3px solid ${conf.color}">
+                    <div class="quest-category-header">
+                        <h2 style="color:${conf.color}">${conf.title}</h2>
+                        <div class="quest-timer">Koniec za: ${formatTimeLeft(timeLeft)}</div>
+                    </div>
+                    <div class="quest-list">`;
+                
+                conf.tasks.forEach((task, index) => {
+                    let progress = stats[task.id] || 0;
+                    let pct = Math.min((progress / task.target) * 100, 100);
+                    let isDone = progress >= task.target;
+                    let isClaimed = state.claims[index];
+                    if (isDone) completedCount++;
+
+                    let btnHtml = '';
+                    if (isClaimed) btnHtml = `<button class="quest-btn claimed" disabled>Odebrane</button>`;
+                    else if (isDone) btnHtml = `<button class="quest-btn claim" onclick="claimQuest('${type}', ${index})">Odbierz</button>`;
+                    else btnHtml = `<button class="quest-btn locked" disabled>W Trakcie</button>`;
+
+                    let rewTxt = [];
+                    if(task.rewardPln) rewTxt.push(task.rewardPln + " PLN");
+                    if(task.rewardPts) rewTxt.push(task.rewardPts + " ⚡");
+
+                    html += `
+                    <div class="quest-item ${isDone ? 'completed' : ''}">
+                        <div class="quest-info">
+                            <div class="quest-title">${task.desc}</div>
+                            <div class="quest-bar-bg"><div class="quest-bar-fill" style="width:${pct}%"></div></div>
+                            <div class="quest-progress-text">${Math.floor(progress)} / ${task.target}</div>
+                        </div>
+                        <div class="quest-reward">${rewTxt.join(' + ')}</div>
+                        ${btnHtml}
+                    </div>`;
+                });
+
+                let allDone = completedCount === 5;
+                let bigBtn = '';
+                if(state.bigClaimed) bigBtn = `<button class="quest-btn claimed" disabled>Odebrane</button>`;
+                else if(allDone) bigBtn = `<button class="quest-btn claim" style="background:#00e5ff" onclick="claimBigReward('${type}')">ODBIERZ GŁÓWNĄ</button>`;
+                else bigBtn = `<button class="quest-btn locked" disabled>${completedCount}/5 Ukończono</button>`;
+
+                html += `</div>
+                    <div class="big-reward-box ${allDone ? 'unlocked' : ''}">
+                        <div style="font-weight:900; color:#fff;">${conf.bigReward.desc}</div>
+                        ${bigBtn}
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function claimQuest(type, index) {
+            let task = questConfig[type].tasks[index];
+            if (questState[type].claims[index]) return;
+            questState[type].claims[index] = true;
+            if (task.rewardPln) updateBalance(task.rewardPln);
+            if (task.rewardPts) { points += task.rewardPts; updateUI(); }
+            
+            playWin(); shootConfetti(); saveData(); renderQuests();
+        }
+
+        function claimBigReward(type) {
+            if (questState[type].bigClaimed) return;
+            let rew = questConfig[type].bigReward;
+            questState[type].bigClaimed = true;
+            
+            let alertMsg = "Zgarniasz nagrodę główną!\n";
+            if(rew.pln) { updateBalance(rew.pln); alertMsg += `+ ${rew.pln} PLN\n`; }
+            if(rew.pts) { points += rew.pts; updateUI(); alertMsg += `+ ${rew.pts} ⚡\n`; }
+            
+            if(rew.skinTier) {
+                let pool = casesData.flatMap(c=>c.items).filter(i=>i.tier === rew.skinTier);
+                if(pool.length > 0) {
+                    let w = rollItem(pool);
+                    w.savedPrice = getPrice(w.tier, w.wearMultiplier, w.isStatTrak);
+                    inventory.push(w);
+                    alertMsg += `+ Skin: ${w.name} (${w.savedPrice} PLN)\n`;
+                }
+            }
+            
+            playEpic(); shakeScreen(); shootConfetti();
+            alert(alertMsg);
+            saveData(); renderQuests();
+        }
+
     </script>
 </body>
 </html>
