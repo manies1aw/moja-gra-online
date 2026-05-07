@@ -116,8 +116,12 @@ const casesData = [
                 { name: "AK-47 | Rat Rod", tier: "purple" }, { name: "M4A1-S | Basilisk", tier: "purple" }, { name: "M4A4 | Evil Daimyo", tier: "purple" }, { name: "AWP | Exoskeleton", tier: "purple" }, { name: "CZ75-Auto | Vendetta", tier: "purple" },
                 { name: "AK-47 | Phantom Disruptor", tier: "pink" }, { name: "M4A1-S | Nightmare", tier: "pink" }, { name: "FAMAS | Afterimage", tier: "pink" },
                 { name: "Desert Eagle | Printstream", tier: "red" }, { name: "AK-47 | Bloodsport", tier: "red" },
-                { name: "★ M9 Bayonet | Marble Fade", tier: "gold" } ] }
-];
+                { name: "★ M9 Bayonet | Marble Fade", tier: "gold" },
+            ] },
+            { id: 'maniek', name: 'Skrzynia Maniek', price: 30.00, items: [
+                { name: "Galil AR | Rocket Pop", tier: "blue" }, { name: "Glock-18 | High Beam", tier: "blue" }, { name: "M4A4 | Poly Mag", tier: "blue" }, { name: "MAC-10 | Ensnare", tier: "blue" }, { name: "P90 | Grim", tier: "blue" }, { name: "P250 | Cassette", tier: "blue" }, { name: "SSG 08 | Abyss", tier: "blue" }, { name: "AK-47 | Slate", tier: "purple" }, { name: "Desert Eagle | Light Rail", tier: "purple" }, { name: "M4A1-S | Night Terror", tier: "purple" }, { name: "UMP-45 | Crimson Foil", tier: "purple" },
+                { name: "XM1014 | Entombed", tier: "purple" },  name: "AK-47 | Ice Coaled", tier: "pink" },  name: "AWP | Chromatic Aberration", tier: "red},  name: "AWP | Mortis", tier: "pink" },  name: "P90 | Nostalgia", tier: "pink" },  name: "MP7 | Bloodsport", tier: "red" },  name: "★ Butterfly Knife | Doppler Phase 4", tier: "gold" } ],
+            ];
 // =========================================================================
 
 const tierChances = { "blue": 79.92, "purple": 15.98, "pink": 3.20, "red": 0.64, "gold": 0.26 };
