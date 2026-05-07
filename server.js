@@ -119,7 +119,6 @@ const casesData = [
                 { name: "★ M9 Bayonet | Marble Fade", tier: "gold" },
             ] },
             { id: 'maniek', name: 'Skrzynia Maniek', price: 30.00, items: [
-                { id: 'maniek', name: 'Skrzynia MANIEK', price: 100.00, items: [
                 { name: "Galil AR | Rocket Pop", tier: "blue" },
                 { name: "Glock-18 | High Beam", tier: "blue" },
                 { name: "M4A4 | Poly Mag", tier: "blue" },
@@ -133,7 +132,7 @@ const casesData = [
                 { name: "UMP-45 | Crimson Foil", tier: "purple" },
                 { name: "XM1014 | Entombed", tier: "purple" },
                 { name: "AK-47 | Ice Coaled", tier: "pink" },
-                { name: "AWP | Chromatic Aberration", tier: "pink" },
+                { name: "AWP | Chromatic Aberration", tier: "red" },
                 { name: "AWP | Mortis", tier: "pink" },
                 { name: "P90 | Nostalgia", tier: "pink" },
                 { name: "MP7 | Bloodsport", tier: "red" },
