@@ -180,6 +180,11 @@ function rollItemServer(caseId) {
 let activeBattle = null;
 
 io.on('connection', (socket) => {
+ // Obsługa Czatu Globalnego
+    socket.on('chatMessage', (data) => { io.emit('chatMessage', data); });
+    
+    // Obsługa Live Drops (ostatnie dropy na stronie)
+    socket.on('itemDropped', (data) => { io.emit('globalDrop', data); });   
     console.log('Nowy gracz:', socket.id);
     if (activeBattle) socket.emit('battleAvailable', activeBattle.queue.length);
 

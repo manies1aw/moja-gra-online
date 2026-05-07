@@ -158,10 +158,49 @@
         .quest-btn.locked { background: #1c182b; color: #555; cursor: not-allowed; border: 1px solid #2d2642; }
         .big-reward-box { margin-top: 25px; background: rgba(0, 229, 255, 0.05); border: 2px dashed #00e5ff; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
         .big-reward-box.unlocked { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; }
+/* KOREKTA TŁA POD LIVE DROPS */
+        body { padding-top: 155px !important; }
+
+        /* LIVE DROPS */
+        .live-drops-container { position: fixed; top: 75px; left: 0; width: 100%; height: 75px; background: rgba(10, 10, 16, 0.95); border-bottom: 1px solid rgba(255, 0, 200, 0.3); overflow: hidden; display: flex; align-items: center; z-index: 900; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .live-drops-track { display: flex; gap: 15px; padding: 0 20px; transition: 0.5s; align-items: center; height: 100%; overflow-x: auto; scrollbar-width: none; }
+        .live-drops-track::-webkit-scrollbar { display: none; }
+        .live-drop-item { display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 5px 15px; min-width: max-content; border: 1px solid; animation: slideInDrop 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); cursor: pointer; transition: 0.3s; }
+        .live-drop-item:hover { transform: scale(1.05); background: rgba(255,255,255,0.1); }
+        @keyframes slideInDrop { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        .live-drop-item img { height: 45px; margin-right: 10px; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5)); }
+        .live-drop-info { display: flex; flex-direction: column; justify-content: center; }
+        .live-drop-user { font-size: 10px; color: #8b8b9e; font-weight: bold; margin-bottom: 2px;}
+        .live-drop-name { font-size: 11px; font-weight: 900; color: #fff; }
+
+        /* CZAT GLOBALNY */
+        .chat-container { position: fixed; bottom: 0; left: 20px; width: 320px; background: rgba(17, 14, 26, 0.95); border: 1px solid #2d2642; border-bottom: none; border-radius: 12px 12px 0 0; z-index: 1000; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); height: 400px; transform: translateY(355px); box-shadow: 0 -5px 25px rgba(0,0,0,0.5); }
+        .chat-container.open { transform: translateY(0); }
+        .chat-header { padding: 12px; background: linear-gradient(90deg, #ff007a, #9d00ff); color: white; font-weight: 900; text-align: center; border-radius: 12px 12px 0 0; cursor: pointer; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 13px; scrollbar-width: thin; scrollbar-color: #ff00e5 transparent; }
+        .chat-msg { background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; word-break: break-word; border-left: 3px solid #00e5ff; animation: fadeIn 0.3s; }
+        .chat-msg .user { font-weight: 900; color: #00e5ff; margin-right: 6px; }
+        .chat-input-area { display: flex; padding: 10px; border-top: 1px solid #2d2642; background: #0a0a10; }
+        .chat-input-area input { flex: 1; background: #1c182b; border: 1px solid #2d2642; color: #fff; padding: 10px; border-radius: 6px; outline: none; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 12px;}
+        .chat-input-area button { background: #00e5ff; color: #000; border: none; padding: 10px 15px; margin-left: 5px; border-radius: 6px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .chat-input-area button:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(0,229,255,0.5); }
     </style>
 </head>
 <body>
+<div class="live-drops-container">
+        <div class="live-drops-track" id="liveDropsTrack"></div>
+    </div>
 
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header" onclick="toggleChat()"><span>💬 CZAT GLOBALNY</span><span id="chatToggleIcon">▲</span></div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg"><span class="user" style="color:#ff007a;">System:</span>Witaj na czacie! Bądź miły dla innych.</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Napisz wiadomość..." maxlength="80" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()">WYŚLIJ</button>
+        </div>
+    </div>
     <nav class="navbar">
         <div class="logo">MANI<span>UREK</span></div>
         <ul class="nav-links">
@@ -768,6 +807,7 @@
                 for(let i=0; i<80; i++) roll.appendChild(createSimpleItem(rollItem(currentCase.items)));
                 let w = rollItem(currentCase.items); w.savedPrice = getPrice(w.tier, w.wearMultiplier, w.isStatTrak);
                 currentWon.push(w); roll.replaceChild(createSimpleItem(w), roll.children[75]);
+broadcastDrop(w);
                 setTimeout(()=>{ roll.style.transition="transform 6s cubic-bezier(0.1, 0, 0.05, 1)"; roll.style.transform=`translateX(-${(75*171)-(roll.parentElement.offsetWidth/2)+85+(Math.random()*100-50)}px)`; }, 50);
             }
             setTimeout(() => {
@@ -813,6 +853,54 @@
         try { socket = io(); } catch(e) { console.log("Brak połączenia z serwerem. Gramy offline."); }
 
         if (socket) {
+// Pytanie o nick gracza
+        let myUsername = localStorage.getItem('m_username');
+        if(!myUsername) {
+            myUsername = prompt("Witaj! Podaj swój nick do gry Online (Czat i Bitwy):", "Gracz" + Math.floor(Math.random()*1000));
+            if(!myUsername || myUsername.trim() === "") myUsername = "Anonim";
+            localStorage.setItem('m_username', myUsername);
+        }
+
+        // === CZAT GLOBALNY ===
+        window.toggleChat = function() { 
+            let c = document.getElementById('chatContainer');
+            c.classList.toggle('open'); 
+            document.getElementById('chatToggleIcon').innerText = c.classList.contains('open') ? "▼" : "▲";
+        };
+        
+        window.sendChatMessage = function() {
+            let inp = document.getElementById('chatInput'); let txt = inp.value.trim();
+            if(txt.length > 0 && socket) { socket.emit('chatMessage', { user: myUsername, text: txt }); inp.value = ''; }
+        };
+        
+        socket.on('chatMessage', (data) => {
+            let box = document.getElementById('chatMessages');
+            box.innerHTML += `<div class="chat-msg"><span class="user">${data.user}:</span>${data.text}</div>`;
+            box.scrollTop = box.scrollHeight;
+        });
+
+        // === LIVE DROPS ===
+        window.broadcastDrop = function(item) {
+            // Wysyłamy informację na serwer tylko jeśli gracz trafił coś różowego, czerwonego lub złotego (kosę)
+            if(socket && (item.tier === 'pink' || item.tier === 'red' || item.tier === 'gold')) {
+                socket.emit('itemDropped', { user: myUsername, item: item });
+            }
+        };
+
+        socket.on('globalDrop', (data) => {
+            let track = document.getElementById('liveDropsTrack');
+            let it = data.item;
+            let borderColor = it.tier==='gold' ? '#ffd700' : (it.tier==='red' ? '#ff003c' : '#ff00e5');
+            let html = `<div class="live-drop-item ${it.tier}" style="border-color:${borderColor}">
+                            <img src="${getImg(it.name)}">
+                            <div class="live-drop-info">
+                                <div class="live-drop-user">${data.user} trafia:</div>
+                                <div class="live-drop-name" style="color:${borderColor};">${it.name}</div>
+                            </div>
+                        </div>`;
+            track.insertAdjacentHTML('afterbegin', html);
+            if(track.children.length > 15) track.removeChild(track.lastChild); // Usuń najstarsze, jeśli jest ich za dużo
+        });
             socket.on('battleAvailable', (len) => {
                 document.getElementById('btnJoinOnline').style.display = 'block';
                 document.getElementById('btnJoinOnline').innerText = `DOŁĄCZ DO GRACZA ONLINE (${len} Skrzynek)`;
@@ -975,7 +1063,15 @@
             ptr.style.transition="transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)"; ptr.style.transform=`rotate(${ang}deg)`; let t=setInterval(playTick, 100);
             setTimeout(() => {
                 clearInterval(t); let msg = document.getElementById('upgraderResultMsg');
-                if(isWin) { inventory.splice(currentUpgradeItemIndex,1); inventory.push(targetUpgradeItem); msg.innerHTML='<span style="color:#00e5ff">Sukces!</span>'; playWin(); } 
+                if(isWin) { 
+                    inventory.splice(currentUpgradeItemIndex,1); 
+                    inventory.push(targetUpgradeItem); 
+                    msg.innerHTML='<span style="color:#00e5ff">Sukces!</span>'; 
+                    playWin(); 
+                    
+                    // WYSYŁANIE UDANEGO ULEPSZENIA NA SERWER DO LIVE DROPS
+                    broadcastDrop(targetUpgradeItem); 
+                } 
                 else { inventory.splice(currentUpgradeItemIndex,1); msg.innerHTML='<span style="color:#ff003c">Spalone.</span>'; playError(); }
                 stats.upgrades++; saveData(); renderUpgraderInv(); setTimeout(()=>{clearUpgrader(); isUpgrading=false;}, 2500);
             }, 4100);
