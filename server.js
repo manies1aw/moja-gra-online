@@ -120,7 +120,7 @@ const casesData = [
             ] },
             { id: 'maniek', name: 'Skrzynia Maniek', price: 30.00, items: [
                 { name: "Galil AR | Rocket Pop", tier: "blue" }, { name: "Glock-18 | High Beam", tier: "blue" }, { name: "M4A4 | Poly Mag", tier: "blue" }, { name: "MAC-10 | Ensnare", tier: "blue" }, { name: "P90 | Grim", tier: "blue" }, { name: "P250 | Cassette", tier: "blue" }, { name: "SSG 08 | Abyss", tier: "blue" }, { name: "AK-47 | Slate", tier: "purple" }, { name: "Desert Eagle | Light Rail", tier: "purple" }, { name: "M4A1-S | Night Terror", tier: "purple" }, { name: "UMP-45 | Crimson Foil", tier: "purple" },
-                { name: "XM1014 | Entombed", tier: "purple" },  name: "AK-47 | Ice Coaled", tier: "pink" },  name: "AWP | Chromatic Aberration", tier: "red},  name: "AWP | Mortis", tier: "pink" },  name: "P90 | Nostalgia", tier: "pink" },  name: "MP7 | Bloodsport", tier: "red" },  name: "★ Butterfly Knife | Doppler Phase 4", tier: "gold" } ],
+                { name: "XM1014 | Entombed", tier: "purple" }, { name: "AK-47 | Ice Coaled", tier: "pink" },  name: "AWP | Chromatic Aberration", tier: "red},  name: "AWP | Mortis", tier: "pink" },  name: "P90 | Nostalgia", tier: "pink" },  name: "MP7 | Bloodsport", tier: "red" },  name: "★ Butterfly Knife | Doppler Phase 4", tier: "gold" } ],
             ];
 // =========================================================================
 
