@@ -647,6 +647,7 @@
         }
         function getImg(name) { return (localImages[name]||'brak.webp').split('%').join('%25').replace(/'/g,''); }
         function genCardHTML(item, bHtml="") {
+            if (!item) return ''; // <--- TARCZA: Zabezpieczenie przed pustym przedmiotem
             let sW = item.wear==="Factory New"?"FN":item.wear==="Minimal Wear"?"MW":item.wear==="Field-Tested"?"FT":item.wear==="Well-Worn"?"WW":"BS";
             return `<div class="inv-item-wrapper ${item.tier}"><div class="inv-item-top"><div class="inv-item-wear">${sW}</div><div class="inv-item-price">${item.savedPrice||'0.00'} PLN</div></div><div class="inv-item-image"><img src="${getImg(item.name)}"></div><div class="inv-item-info">${item.isStatTrak?`<div class="inv-item-st">ST™</div>`:''}<div class="inv-item-name">${item.name}</div></div>${bHtml}</div>`;
         }
@@ -682,12 +683,30 @@
         function closeInventoryModal() { document.getElementById('inventoryModal').classList.remove('active'); }
         function closeModalOnOutsideClick(e, id, f) { if(e.target.id===id) f(); }
         function renderInventory() {
-            const g=document.getElementById('inventoryGrid'); g.innerHTML='';
-            document.getElementById('inventoryTotalValue').innerText=inventory.reduce((s,i)=>s+parseFloat(i.savedPrice||0),0).toFixed(2)+" PLN";
+            // 1. Zabezpieczenie przed zepsutą pamięcią (wymusza tablicę)
+            if (!Array.isArray(inventory)) inventory = []; 
+            
+            // 2. Automatyczne sprzątanie: Usuwa zepsute/puste skiny (tzw. null) z zapisu gry
+            inventory = inventory.filter(i => i !== null && i !== undefined && i.name); 
+            
+            const g = document.getElementById('inventoryGrid'); 
+            g.innerHTML = '';
+            
+            // 3. Bezpieczne liczenie łącznej wartości ekwipunku
+            let totalValue = 0;
+            inventory.forEach(i => { if (i && i.savedPrice) totalValue += parseFloat(i.savedPrice); });
+            document.getElementById('inventoryTotalValue').innerText = totalValue.toFixed(2) + " PLN";
+            
+            // 4. Wyświetlanie poprawionych przedmiotów
             [...inventory].reverse().forEach((item, rIdx) => {
-                let d = document.createElement('div'); d.innerHTML=genCardHTML(item, `<button class="inv-sell-btn" onclick="sellFromInventory(${inventory.length-1-rIdx})">Sprzedaj</button>`);
+                let realIdx = inventory.length - 1 - rIdx;
+                let d = document.createElement('div'); 
+                d.innerHTML = genCardHTML(item, `<button class="inv-sell-btn" onclick="sellFromInventory(${realIdx})">Sprzedaj</button>`);
                 g.appendChild(d.firstElementChild);
             });
+            
+            // 5. Zapisujemy naprawiony, czysty ekwipunek z powrotem do pamięci
+            saveData(); 
         }
         function sellAllInventory() { updateBalance(inventory.reduce((s,i)=>s+parseFloat(i.savedPrice||0),0)); inventory=[]; renderInventory(); clearUpgrader(); clearTradeup(); clearCoinflip(); clearBjBet(); }
         function sellFromInventory(i) { updateBalance(parseFloat(inventory[i].savedPrice)); inventory.splice(i,1); renderInventory(); clearUpgrader(); clearTradeup(); clearCoinflip(); clearBjBet(); }
